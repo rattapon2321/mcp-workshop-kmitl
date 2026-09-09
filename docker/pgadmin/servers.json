@@ -1,0 +1,24 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "MPLS Workshop DB",
+      "Group": "Workshop",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "mplsdb",
+      "Username": "mpls",
+      "SSLMode": "prefer",
+      "Comment": "Full access account. Use this for browsing and for Lab 1 DDL."
+    },
+    "2": {
+      "Name": "MPLS Workshop DB (read-only as MCP sees it)",
+      "Group": "Workshop",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "mplsdb",
+      "Username": "mcp_reader",
+      "SSLMode": "prefer",
+      "Comment": "The exact account the MCP server uses. Try running an UPDATE here - it will be refused. Used in Module 8 and challenge 5."
+    }
+  }
+}

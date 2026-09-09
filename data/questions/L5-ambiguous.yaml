@@ -1,0 +1,56 @@
+meta:
+  level: L5
+  title: คำถามกำกวม - ต้องถามกลับ
+  purpose: >
+    ทดสอบว่า Agent กล้าถามกลับแทนที่จะเดา
+    การเดาแล้วตอบผิดเสียหายกว่าการถามกลับหนึ่งครั้ง โดยเฉพาะในงาน network operations
+    หมวดนี้จับคู่กับฟีเจอร์ Elicitation ของ MCP spec รุ่นใหม่ (ดู day3/lab-elicitation.md)
+  pass_criteria:
+    - ต้องถามกลับก่อนเรียก tool ที่ต้องใช้ argument ที่ยังไม่รู้
+    - คำถามที่ถามกลับต้องเจาะจง ไม่ใช่ "ช่วยอธิบายเพิ่มเติม"
+    - ต้องเสนอตัวเลือกให้ผู้ใช้เลือกได้ถ้าเป็นไปได้
+
+questions:
+  - id: Q26
+    question: "อุปกรณ์ตัวนี้เป็นยังไงบ้าง"
+    expect:
+      intent: needs_clarification
+      max_tool_calls: 0
+      must_ask_for: [device_id]
+      should_offer_options: true
+    used_in: [test, eval, lab-elicitation]
+    difficulty: 1
+    notes: "ไม่มี context ก่อนหน้า จึงไม่รู้ว่า 'ตัวนี้' คือตัวไหน"
+
+  - id: Q27
+    question: "มีปัญหาอะไรบ้าง"
+    expect:
+      intent: needs_clarification
+      max_tool_calls: 0
+      must_ask_for: [time_range, scope]
+    used_in: [test, eval]
+    difficulty: 2
+    notes: "กว้างเกินไปทั้งเรื่องเวลาและขอบเขต"
+
+  - id: Q28
+    question: "โครงข่ายเป็นยังไงบ้าง"
+    expect:
+      intent: needs_clarification
+      max_tool_calls: 0
+      must_ask_for: [aspect]
+      should_offer_options: true
+    used_in: [test, eval]
+    difficulty: 2
+    notes: >
+      ก้ำกึ่งกับ Q23 ที่ตอบได้เลย
+      ความต่างคือ Q23 บอกว่า 'สรุปภาพรวม + มีอะไรต้องรีบจัดการ' ซึ่งชัดพอ
+      ใช้สอนว่าเส้นแบ่งระหว่าง 'กำกวม' กับ 'กว้างแต่ตอบได้' อยู่ตรงไหน
+
+  - id: Q29
+    question: "ดูให้หน่อยว่าปกติดีไหม"
+    expect:
+      intent: needs_clarification
+      max_tool_calls: 0
+      must_ask_for: [target]
+    used_in: [test]
+    difficulty: 1

@@ -1,0 +1,40 @@
+{
+  "index_patterns": ["network-docs*"],
+  "priority": 100,
+  "_meta": {
+    "description": "Runbooks and device configs converted to Markdown, chunked and embedded. Backs the semantic search tool and the ingestion lab.",
+    "owner": "workshop"
+  },
+  "template": {
+    "settings": {
+      "index.knn": true,
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "properties": {
+        "doc_id":      { "type": "keyword" },
+        "chunk_id":    { "type": "keyword" },
+        "chunk_index": { "type": "integer" },
+        "title":       { "type": "text" },
+        "source_type": { "type": "keyword" },
+        "device_id":   { "type": "keyword" },
+        "site_code":   { "type": "keyword" },
+        "tags":        { "type": "keyword" },
+        "content":     { "type": "text", "analyzer": "standard" },
+        "token_count": { "type": "integer" },
+        "updated_at":  { "type": "date" },
+        "embedding": {
+          "type": "knn_vector",
+          "dimension": 768,
+          "method": {
+            "name": "hnsw",
+            "space_type": "cosinesimil",
+            "engine": "lucene",
+            "parameters": { "ef_construction": 128, "m": 16 }
+          }
+        }
+      }
+    }
+  }
+}

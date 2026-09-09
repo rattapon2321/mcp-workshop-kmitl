@@ -1,0 +1,7 @@
+Aug 23 12:00:01 PE-NBI-04: %ISIS-4-ADJREJECT: Rejected adjacency with CR-BKK-02 on Te0/0/1: MTU mismatch (local 1500, remote 9000)
+2025-08-23T12:30:00+07:00 LPE-NBI-11 link down on Ge0/0/1
+this line has no timestamp and no host and should fail to parse
+Aug 23 13:00:02 PE-NBI-04: %ISIS-4-ADJREJECT: Rejected adjacency with CR-BKK-02 on Te0/0/1: MTU mismatch (local 1500, remote 9000)
+!!! CORRUPTED BLOCK !!! ^@^@^@ binary garbage from a truncated transfer
+Aug 23 13:30:11 PE-NBI-04: %ISIS-5-ADJCHANGE: Adjacency to CR-BKK-02 (Level-2) Init -> Down on Te0/0/1
+[2025/08/23 14:00:00] some-other-collector-format device=PE-NBI-04 msg="unsupported vendor format"

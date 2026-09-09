@@ -1,0 +1,2 @@
+api: uvicorn main:app --host 0.0.0.0 --port 8080 --app-dir apps/agent-api
+ui: chainlit run apps/demo-app/app.py --host 0.0.0.0 --port 8000 --headless

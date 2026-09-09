@@ -1,0 +1,61 @@
+[project]
+name = "ai-mpls-workshop"
+version = "1.0.0"
+description = "AI x IP-MPLS Workshop — Agent + MCP Server for network operations"
+requires-python = ">=3.11"
+dependencies = [
+    # --- LLM / embedding / rerank ---
+    "openai>=1.40",
+    "httpx>=0.27",
+    "tiktoken>=0.7",              # kept only to demonstrate that the WRONG tokenizer gives wrong counts
+    "transformers>=4.44",         # the real Gemma tokenizer (SentencePiece)
+    "sentencepiece>=0.2",
+    "pythainlp>=5.0",             # Thai word segmentation
+
+    # --- MCP ---
+    "mcp>=1.2",
+    "fastmcp>=2.0",
+
+    # --- backend / UI ---
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sse-starlette>=2.1",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "chainlit>=1.3",
+
+    # --- databases ---
+    "psycopg[binary]>=3.2",
+    "pgvector>=0.3",
+    "neo4j>=5.24",
+    "opensearch-py>=2.7",
+
+    # --- utilities ---
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "rich>=13.7",
+    "typer>=0.12",
+    "watchdog>=4.0",              # log folder watch mode
+    "tenacity>=9.0",              # retry helpers
+    "reportlab>=4.2",             # PDF export
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.6",
+]
+eval = [
+    "sacrebleu>=2.4",
+    "rouge-score>=0.1.2",
+    "pandas>=2.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

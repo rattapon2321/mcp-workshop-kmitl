@@ -1,0 +1,144 @@
+# ============================================================
+# S1 - Interface flapping on APE-NBI-03  (the headline scenario)
+#
+# Story: three LPEs serve different customers but all uplink to the same
+# APE. That APE has an interface that keeps bouncing. Each bounce drops
+# customer traffic for a few seconds - long enough for people to complain,
+# short enough that everything tests fine afterwards.
+#
+# The agent must notice that tickets from unrelated customers share one
+# upstream device, then correlate that device's logs with the ticket times.
+# Nothing in the ticket text mentions the APE.
+# ============================================================
+
+id: S1
+name: Interface flapping on APE-NBI-03
+device: APE-NBI-03
+interface: Te0/1/2
+total_lines: 320
+window_hours_ago: [336, 6]        # last 14 days, stopping 6h before "now"
+
+# 40 flap events. Each one emits the burst below.
+bursts:
+  count: 40
+  jitter_minutes: 90              # avoids a suspiciously regular pattern
+  lines:
+    - offset_seconds: 0
+      severity: error
+      severity_num: 3
+      facility: LINK
+      mnemonic: UPDOWN
+      event_type: LINK-UPDOWN
+      message: "Interface {interface}, changed state to down"
+    - offset_seconds: 1
+      severity: error
+      severity_num: 3
+      facility: LINEPROTO
+      mnemonic: UPDOWN
+      event_type: LINEPROTO-UPDOWN
+      message: "Line protocol on Interface {interface}, changed state to down"
+    - offset_seconds: 2
+      severity: notice
+      severity_num: 5
+      facility: ISIS
+      mnemonic: ADJCHANGE
+      event_type: ISIS-ADJCHANGE
+      message: "Adjacency to PE-NBI-01 (Level-2) Down, interface {interface}"
+    - offset_seconds: 3
+      severity: notice
+      severity_num: 5
+      facility: LDP
+      mnemonic: NBRCHG
+      event_type: LDP-NBRCHG
+      message: "LDP neighbor 10.20.1.1:0 is DOWN"
+    - offset_seconds: 34
+      severity: notice
+      severity_num: 5
+      facility: LINK
+      mnemonic: UPDOWN
+      event_type: LINK-UPDOWN
+      message: "Interface {interface}, changed state to up"
+    - offset_seconds: 35
+      severity: notice
+      severity_num: 5
+      facility: LINEPROTO
+      mnemonic: UPDOWN
+      event_type: LINEPROTO-UPDOWN
+      message: "Line protocol on Interface {interface}, changed state to up"
+    - offset_seconds: 41
+      severity: notice
+      severity_num: 5
+      facility: ISIS
+      mnemonic: ADJCHANGE
+      event_type: ISIS-ADJCHANGE
+      message: "Adjacency to PE-NBI-01 (Level-2) Up, interface {interface}"
+    - offset_seconds: 45
+      severity: info
+      severity_num: 6
+      facility: LDP
+      mnemonic: NBRCHG
+      event_type: LDP-NBRCHG
+      message: "LDP neighbor 10.20.1.1:0 is UP"
+
+# Tickets raised by customers hanging off the three LPEs. Note the wording:
+# nobody mentions the APE, because nobody downstream can see it.
+tickets:
+  - device_id: LPE-NBI-11
+    category: intermittent
+    severity: high
+    status: open
+    hours_ago: 310
+    title: "อินเทอร์เน็ตหลุดเป็นช่วงๆ ตั้งแต่เมื่อวาน"
+    description: "ลูกค้าแจ้งว่าใช้งานอยู่ดีๆ แล้วหลุดไปประมาณ 30 วินาที เกิดวันละหลายครั้ง ไม่มีรูปแบบเวลาที่แน่นอน ทดสอบสาย LAN ฝั่งลูกค้าแล้วปกติ"
+    messages:
+      - [customer, "ใช้งาน video conference แล้วหลุดบ่อยมากครับ วันละ 5-6 ครั้ง"]
+      - [engineer, "รับเรื่องแล้วครับ จะตรวจสอบ circuit ให้ กรุณาแจ้งเวลาที่หลุดล่าสุดด้วยครับ"]
+
+  - device_id: LPE-NBI-12
+    category: intermittent
+    severity: medium
+    status: closed
+    hours_ago: 280
+    closed_after_hours: 20
+    resolution: "ทดสอบแล้ว ping ปกติ throughput เต็ม ปิดเคสชั่วคราว"
+    title: "เน็ตกระตุกเป็นช่วง ใช้งานไม่ต่อเนื่อง"
+    description: "แจ้งว่าเน็ตกระตุกเป็นระยะ engineer เข้าตรวจสอบพบว่าตอนที่ทดสอบทุกอย่างปกติ"
+    messages:
+      - [customer, "เน็ตกระตุกครับ โหลดไฟล์ค้างกลางทาง"]
+      - [engineer, "ทดสอบ ping 500 packet ไม่ drop เลยครับ throughput ได้เต็ม speed ขอปิดเคสก่อนนะครับ"]
+      - [customer, "ok ครับ แต่ถ้าเป็นอีกจะแจ้งใหม่"]
+
+  - device_id: LPE-NBI-13
+    category: intermittent
+    severity: high
+    status: open
+    hours_ago: 190
+    title: "circuit drop ซ้ำๆ กระทบระบบ POS"
+    description: "ลูกค้าใช้ระบบ POS ที่ต้องต่อ online ตลอด เมื่อ connection หลุดต้อง login ใหม่ทุกครั้ง กระทบการให้บริการหน้าร้าน"
+    messages:
+      - [customer, "ระบบ POS หลุดแล้วต้อง login ใหม่ วันนี้เป็นมา 4 รอบแล้วครับ"]
+      - [engineer, "ขอเวลาตรวจสอบ upstream ครับ"]
+
+  - device_id: LPE-NBI-11
+    category: intermittent
+    severity: medium
+    status: closed
+    hours_ago: 150
+    closed_after_hours: 8
+    resolution: "ทดสอบแล้วปกติ แนะนำให้ลูกค้าเปลี่ยน router ฝั่งตัวเอง"
+    title: "หลุดบ่อยช่วงบ่าย"
+    description: "แจ้งว่าหลุดบ่อยเป็นพิเศษช่วงบ่าย แต่ตอน engineer ทดสอบไม่พบปัญหา"
+    messages:
+      - [customer, "ช่วงบ่ายหลุดบ่อยกว่าช่วงเช้าครับ"]
+      - [engineer, "ตรวจสอบ circuit แล้วไม่พบความผิดปกติครับ อาจเป็นที่อุปกรณ์ปลายทาง"]
+
+  - device_id: LPE-NBI-12
+    category: intermittent
+    severity: high
+    status: open
+    hours_ago: 60
+    title: "เน็ตหลุดซ้ำ เคสเดิมที่เคยแจ้งไว้"
+    description: "ลูกค้าเปิดเคสใหม่หลังจากเคสเดิมถูกปิดไป อาการเหมือนเดิมทุกอย่าง หลุดสั้นๆ แล้วกลับมาเอง"
+    messages:
+      - [customer, "เคสเดิมที่ปิดไปกลับมาเป็นอีกแล้วครับ อาการเหมือนเดิมเป๊ะ"]
+      - [engineer, "ขออภัยครับ จะยกระดับให้ทีม core network ตรวจสอบ upstream ให้"]

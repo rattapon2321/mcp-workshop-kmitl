@@ -1,0 +1,62 @@
+# ============================================================
+# Occasional errors on the remaining devices.
+#
+# Without this, "which device has the most errors this week" is answerable
+# by finding the one device that has any errors at all. 170 lines spread
+# across devices that are NOT part of a scenario keeps the ranking
+# meaningful without creating a competing story.
+# ============================================================
+
+id: FILLER
+name: Sporadic errors on non-scenario devices
+total_lines: 170
+window_hours_ago: [720, 0]
+devices:
+  - CR-BKK-01
+  - CR-BKK-02
+  - PE-NBI-01
+  - LPE-NBI-11
+  - LPE-NBI-12
+  - LPE-NBI-13
+
+templates:
+  - weight: 35
+    severity: warning
+    severity_num: 4
+    facility: LINEPROTO
+    mnemonic: CRC
+    event_type: LINEPROTO-CRC
+    message: "Interface {interface}: {crc_count} input CRC errors in last 5 minutes"
+  - weight: 25
+    severity: error
+    severity_num: 3
+    facility: BGP
+    mnemonic: ADJCHANGE
+    event_type: BGP-ADJCHANGE
+    message: "neighbor {peer_ip} Down - hold timer expired"
+  - weight: 20
+    severity: warning
+    severity_num: 4
+    facility: SEC
+    mnemonic: LOGIN_FAILED
+    event_type: SEC-LOGIN_FAILED
+    message: "Login failed for user admin from 10.99.0.{octet}"
+  - weight: 20
+    severity: warning
+    severity_num: 4
+    facility: ENV
+    mnemonic: FAN
+    event_type: ENV-FAN
+    message: "Fan tray 1 speed {fan_rpm} rpm below nominal"
+
+# Filler tickets: ordinary day-to-day noise so the ticket table is not
+# made up entirely of scenario tickets. Generated in bulk by seed.py.
+filler_tickets:
+  count: 110
+  window_hours_ago: [2160, 0]     # 90 days
+  status_mix: {closed: 0.75, in_progress: 0.10, open: 0.15}
+  severity_mix: {low: 0.35, medium: 0.40, high: 0.20, critical: 0.05}
+  category_mix: {link_down: 0.20, slow: 0.25, inquiry: 0.25, config: 0.15, maintenance: 0.15}
+  # Never assign a filler ticket to PE-BKK-02 - scenario S2 depends on it
+  # having no tickets at all.
+  exclude_devices: [PE-BKK-02]

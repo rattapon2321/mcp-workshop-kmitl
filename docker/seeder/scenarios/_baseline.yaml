@@ -1,0 +1,73 @@
+# ============================================================
+# Baseline noise: ordinary operational logs.
+#
+# Purpose: without noise the scenarios are trivially findable and the
+# workshop teaches nothing about filtering. 900 lines spread across all
+# 10 devices over the retention window.
+#
+# All times are expressed as hours_ago so the dataset is never tied to a
+# calendar date. See data/scenarios.md section 7.
+# ============================================================
+
+id: BASELINE
+name: Ordinary operational traffic
+total_lines: 900
+spread_hours_ago: [720, 0]        # 30 days back to now
+devices: all
+
+templates:
+  - weight: 30
+    severity: info
+    severity_num: 6
+    facility: SYS
+    mnemonic: CONFIG_I
+    event_type: SYS-CONFIG_I
+    message: "Configured from console by admin"
+
+  - weight: 20
+    severity: info
+    severity_num: 6
+    facility: SNMP
+    mnemonic: COLDSTART
+    event_type: SNMP-COLDSTART
+    message: "SNMP agent poll completed"
+
+  - weight: 15
+    severity: notice
+    severity_num: 5
+    facility: BGP
+    mnemonic: ADJCHANGE
+    event_type: BGP-ADJCHANGE
+    message: "neighbor {peer_ip} Up"
+
+  - weight: 12
+    severity: info
+    severity_num: 6
+    facility: NTP
+    mnemonic: SYNC
+    event_type: NTP-SYNC
+    message: "NTP clock synchronised to 10.0.0.10"
+
+  - weight: 10
+    severity: notice
+    severity_num: 5
+    facility: SEC
+    mnemonic: LOGIN
+    event_type: SEC-LOGIN
+    message: "Login succeeded for user noc-operator from 10.99.0.{octet}"
+
+  - weight: 8
+    severity: warning
+    severity_num: 4
+    facility: ENV
+    mnemonic: TEMP
+    event_type: ENV-TEMP
+    message: "Inlet temperature {temp}C within normal range"
+
+  - weight: 5
+    severity: info
+    severity_num: 6
+    facility: LDP
+    mnemonic: NBRCHG
+    event_type: LDP-NBRCHG
+    message: "LDP neighbor {peer_ip}:0 is UP"

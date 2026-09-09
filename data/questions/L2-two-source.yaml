@@ -1,0 +1,113 @@
+meta:
+  level: L2
+  title: คำถามที่ต้องใช้สองแหล่ง
+  purpose: >
+    จุดที่ Agent เริ่ม "ต้องวางแผน" จริง — ผลจาก tool แรกกลายเป็น argument ของ tool ที่สอง
+    ถ้าผู้เรียนทำ L2 ได้ แสดงว่า executor จัดการ dependency ระหว่างขั้นตอนเป็นแล้ว
+  pass_criteria:
+    - ต้องมี tool call อย่างน้อย 2 ครั้งจากคนละแหล่ง
+    - ขั้นที่ 2 ต้องใช้ผลจากขั้นที่ 1 (ไม่ใช่เดา argument เอง)
+
+questions:
+  - id: Q15
+    question: "ticket ที่ยังไม่ปิดใบล่าสุดเกี่ยวกับอุปกรณ์ตัวไหน แล้วอุปกรณ์นั้นต่อกับอะไรบ้าง"
+    sources: [postgres, neo4j]
+    expected_tools: [search_tickets, get_device_neighbors]
+    expect:
+      must_cite: [postgres, neo4j]
+      max_tool_calls: 4
+    used_in: [lab, test]
+    difficulty: 2
+
+  - id: Q16
+    question: "อุปกรณ์ที่มี log error เยอะที่สุดตอนนี้ มี ticket ค้างอยู่หรือเปล่า"
+    scenario: S2
+    sources: [opensearch, postgres]
+    expected_tools: [count_log_events, search_tickets]
+    expect:
+      must_contain: ["PE-BKK-02"]
+      must_not_contain: ["มี ticket ค้าง"]
+      max_tool_calls: 4
+    used_in: [lab, test, eval]
+    difficulty: 3
+    notes: >
+      คำตอบที่ถูกคือ "ไม่มี ticket เลย" ซึ่งเป็นประเด็นสำคัญของ S2
+      Agent ที่ hallucinate มักแต่ง ticket ขึ้นมาให้ดูสมเหตุสมผล
+
+  - id: Q17
+    question: "ทำไม ISIS adjacency ของ PE-NBI-04 ถึงไม่ขึ้น"
+    scenario: S3
+    sources: [postgres, neo4j, opensearch]
+    expected_tools: [get_device_neighbors, get_device_config, search_logs]
+    expect:
+      must_contain: ["MTU", "CR-BKK-02"]
+      must_cite: [postgres, neo4j]
+      max_tool_calls: 6
+    used_in: [lab, test, eval, challenge6]
+    difficulty: 3
+    notes: >
+      ต้องเทียบ config สองฝั่ง และฝั่งหนึ่งอยู่คนละพื้นที่
+      Agent ที่ค้นเฉพาะ NBI จะตอบไม่ได้
+
+  - id: Q18
+    question: "log ที่ APE-BKK-05 เมื่อ 3 วันก่อนเป็นเหตุเสียจริง หรือเป็นงานที่แจ้งไว้ล่วงหน้า"
+    scenario: S4
+    sources: [opensearch, postgres]
+    expected_tools: [search_logs, search_tickets]
+    expect:
+      must_contain: ["maintenance"]
+      must_not_contain: ["เหตุเสียร้ายแรง"]
+      time_window_days: 5
+      max_tool_calls: 4
+    used_in: [lab, test, eval]
+    difficulty: 3
+    notes: "กรณี false positive ที่อันตรายที่สุด — มีหลักฐานจริงแต่ตีความผิด"
+
+  - id: Q19
+    question: "คะแนนสุขภาพของ PE-BKK-02 เป็นเท่าไหร่ เพราะอะไร"
+    scenario: S2
+    sources: [opensearch, postgres]
+    expected_tools: [calculate_health_score]
+    expect:
+      must_contain: ["CRC"]
+      max_tool_calls: 3
+    used_in: [lab, test, eval]
+    difficulty: 2
+
+  - id: Q20
+    question: "ตอนนี้ทั้งโครงข่ายอุปกรณ์ตัวไหนน่าเป็นห่วงที่สุด เพราะอะไร"
+    scenario: S2
+    sources: [opensearch, postgres, neo4j]
+    expected_tools: [calculate_health_score, count_log_events]
+    expect:
+      must_contain: ["PE-BKK-02"]
+      max_tool_calls: 6
+    used_in: [lab, test, eval, demo]
+    difficulty: 3
+    notes: >
+      ต้องคำนวณ health score ทั้ง 10 ตัวแล้วจัดอันดับ
+      เป็นคำถามที่ใช้สอนว่าทำไมวิธีนี้ใช้กับ 2,600 ตัวไม่ได้ (ดู scale-notes.md)
+
+  - id: Q21b
+    question: "ลูกค้าที่นนทบุรีแจ้งเน็ตหลุด ช่วยหาสาเหตุให้หน่อย"
+    scenario: S1
+    sources: [postgres, neo4j]
+    expected_tools: [search_tickets, get_upstream_devices]
+    expect:
+      must_contain: ["APE-NBI-03"]
+      max_tool_calls: 5
+    used_in: [lab]
+    difficulty: 2
+    notes: "เวอร์ชันง่ายของ Q21 (ใบ้พื้นที่ให้) ใช้ตอน lab ก่อนเจอตัวจริง"
+
+  - id: Q22b
+    question: "ปัญหาที่นนทบุรีตอนนี้เกี่ยวข้องกับอุปกรณ์ฝั่งกรุงเทพหรือเปล่า"
+    scenario: S3
+    sources: [neo4j, postgres, opensearch]
+    expected_tools: [get_device_neighbors, get_device_config, search_logs]
+    expect:
+      must_contain: ["CR-BKK-02"]
+      max_tool_calls: 6
+    used_in: [lab, test]
+    difficulty: 3
+    notes: "บังคับให้ Agent ข้ามพื้นที่ — ทดสอบว่าไม่ได้ filter site ตายตัว"

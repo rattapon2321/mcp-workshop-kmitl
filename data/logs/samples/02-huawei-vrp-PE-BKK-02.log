@@ -1,0 +1,7 @@
+Aug 23 2025 02:11:04 PE-BKK-02 %%01IFNET/4/CRC_ERROR(l)[1021]:Interface Te0/1/0/2: 214 input CRC errors in last 5 minutes
+Aug 23 2025 04:23:51 PE-BKK-02 %%01SYSTEM/4/CPU_HIGH(l)[1022]:CPU utilisation 84% exceeds threshold 70% for process fib_mgr
+Aug 23 2025 05:09:12 PE-BKK-02 %%01IFNET/4/CRC_ERROR(l)[1023]:Interface Te0/1/0/2: 267 input CRC errors in last 5 minutes
+Aug 23 2025 07:44:38 PE-BKK-02 %%01ENV/4/TEMP_HIGH(l)[1024]:Inlet temperature 44C above nominal
+Aug 23 2025 09:15:20 PE-BKK-02 %%01FWD/3/PKT_DROP(l)[1025]:Packet drops observed on Te0/1/0/2, queue depth exceeded
+Aug 23 2025 11:02:57 PE-BKK-02 %%01IFNET/4/CRC_ERROR(l)[1026]:Interface Te0/1/0/2: 331 input CRC errors in last 5 minutes
+Aug 23 2025 13:38:41 PE-BKK-02 %%01SYSTEM/4/CPU_HIGH(l)[1027]:CPU utilisation 91% exceeds threshold 70% for process fib_mgr

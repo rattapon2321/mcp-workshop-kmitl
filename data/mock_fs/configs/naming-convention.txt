@@ -1,0 +1,24 @@
+NT IP-MPLS Device Naming Convention
+====================================
+
+Format:  <ROLE>-<SITE>-<NN>
+
+ROLE
+  CR   Core Router          backbone transit between sites
+  PE   Provider Edge        terminates aggregation links and customer VRFs
+  APE  Aggregation PE       collects traffic from local access routers
+  LPE  Local PE             terminates customer access circuits
+
+SITE (3-letter IATA-style code)
+  BKK  Bangkok
+  NBI  Nonthaburi
+
+NN   two-digit sequence within the site
+
+Examples
+  CR-BKK-01    first core router in Bangkok
+  APE-NBI-03   third aggregation PE in Nonthaburi
+  LPE-NBI-11   local PE number 11 in Nonthaburi
+
+Note: the sequence number is NOT contiguous. Numbers are reserved per rack row,
+so gaps are normal and do not indicate a missing device.

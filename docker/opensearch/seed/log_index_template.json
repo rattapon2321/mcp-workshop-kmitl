@@ -1,0 +1,36 @@
+{
+  "index_patterns": ["network-logs-*"],
+  "priority": 100,
+  "_meta": {
+    "description": "Device syslog for the AI x IP-MPLS workshop. One document per log line.",
+    "owner": "workshop"
+  },
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "refresh_interval": "1s"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp":    { "type": "date" },
+        "device_id":     { "type": "keyword" },
+        "site_code":     { "type": "keyword" },
+        "device_role":   { "type": "keyword" },
+        "severity":      { "type": "keyword" },
+        "severity_num":  { "type": "integer" },
+        "facility":      { "type": "keyword" },
+        "mnemonic":      { "type": "keyword" },
+        "event_type":    { "type": "keyword" },
+        "interface":     { "type": "keyword" },
+        "message":       { "type": "text", "analyzer": "standard" },
+        "raw_message":   { "type": "text", "index": false },
+        "source_file":   { "type": "keyword" },
+        "line_no":       { "type": "integer" },
+        "parse_status":  { "type": "keyword" },
+        "scenario":      { "type": "keyword" },
+        "ingested_at":   { "type": "date" }
+      }
+    }
+  }
+}

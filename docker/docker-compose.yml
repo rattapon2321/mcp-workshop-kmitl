@@ -1,0 +1,309 @@
+# ============================================================
+#  AI x IP-MPLS Workshop - infrastructure
+#
+#  Profiles:
+#    (default) postgres, neo4j, opensearch, dashboards, mailhog, seeder, loader
+#    demo      reference implementation app (agent + UI, prebuilt)
+#    llm       local model serving (Ollama + Infinity for embed/rerank)
+#
+#  Usage:
+#    make up            start the default profile and seed
+#    make demo          add the demo app
+#    docker compose --profile llm up -d   start local model serving
+# ============================================================
+
+name: ai-mpls-workshop
+
+x-common-env: &common-env
+  TZ: Asia/Bangkok
+
+services:
+
+  # ----------------------------------------------------------
+  # PostgreSQL + pgvector
+  # Stores tickets, device configs, circuits and customers.
+  # The `vector` extension is installed but the embedding column
+  # is intentionally NOT created - participants add it in Lab 1.
+  # ----------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: mpls-postgres
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      POSTGRES_DB: ${PG_DATABASE:-mplsdb}
+      POSTGRES_USER: ${PG_USER:-mpls}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-mpls_dev_password}
+      MCP_READONLY_USER: ${PG_READONLY_USER:-mcp_reader}
+      MCP_READONLY_PASSWORD: ${PG_READONLY_PASSWORD:-mcp_reader_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Files in this folder run once, in filename order, on first start.
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-mpls} -d ${PG_DATABASE:-mplsdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  # ----------------------------------------------------------
+  # pgAdmin - browse PostgreSQL without installing a client.
+  # Two servers are pre-registered: the full-access account and the
+  # read-only account the MCP server uses. Comparing what each one is
+  # allowed to do is the practical half of the Module 8 security talk.
+  #
+  # Passwords are not stored: enter them from .env on first connect.
+  # ----------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: mpls-pgadmin
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-workshop@example.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-workshop}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_DISABLE_POSTFIX: "True"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ----------------------------------------------------------
+  # Neo4j - network topology (devices, interfaces, adjacencies)
+  # ----------------------------------------------------------
+  neo4j:
+    image: neo4j:5-community
+    container_name: mpls-neo4j
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-neo4j_dev_password}
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 512m
+      NEO4J_apoc_export_file_enabled: "false"
+    ports:
+      - "7474:7474"   # HTTP browser
+      - "7687:7687"   # Bolt
+    volumes:
+      - neo4jdata:/data
+      - ./neo4j/seed:/seed:ro
+    healthcheck:
+      # cypher-shell returns non-zero until the database is ready to serve.
+      test: ["CMD-SHELL", "cypher-shell -u ${NEO4J_USER:-neo4j} -p ${NEO4J_PASSWORD:-neo4j_dev_password} 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  # ----------------------------------------------------------
+  # OpenSearch - device logs and vector search
+  # Security plugin is disabled: this is a workshop sandbox only.
+  # ----------------------------------------------------------
+  opensearch:
+    image: opensearchproject/opensearch:2.17.0
+    container_name: mpls-opensearch
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      discovery.type: single-node
+      bootstrap.memory_lock: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    ports:
+      - "9200:9200"
+    volumes:
+      - osdata:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.17.0
+    container_name: mpls-dashboards
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    ports:
+      - "5601:5601"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  # ----------------------------------------------------------
+  # MailHog - fake SMTP server.
+  # Lets the agent "send email" without anything leaving the machine.
+  # ----------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mpls-mailhog
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
+  # ----------------------------------------------------------
+  # Seeder - one-shot container.
+  # Waits for all three databases, then loads the scenario data.
+  # Timestamps are generated relative to run time, never hardcoded.
+  # ----------------------------------------------------------
+  seeder:
+    build:
+      context: ./seeder
+    container_name: mpls-seeder
+    restart: "no"
+    environment:
+      <<: *common-env
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DATABASE: ${PG_DATABASE:-mplsdb}
+      PG_USER: ${PG_USER:-mpls}
+      PG_PASSWORD: ${PG_PASSWORD:-mpls_dev_password}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-neo4j_dev_password}
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_LOG_INDEX: ${OPENSEARCH_LOG_INDEX:-network-logs}
+      OPENSEARCH_DOC_INDEX: ${OPENSEARCH_DOC_INDEX:-network-docs}
+      SEED_RANDOM_SEED: ${SEED_RANDOM_SEED:-42}
+      SEED_DAYS_BACK: ${SEED_DAYS_BACK:-30}
+    volumes:
+      - ../data:/data:ro
+      - ./neo4j/seed:/seed/neo4j:ro
+      - ./opensearch/seed:/seed/opensearch:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+
+  # ----------------------------------------------------------
+  # Loader - ingests raw log files into OpenSearch.
+  # Drop files into data/logs/incoming/ on the host, then:
+  #   make load-logs
+  # The folder is bind-mounted read-write so processed files can move.
+  # ----------------------------------------------------------
+  loader:
+    build:
+      context: ./loader
+    container_name: mpls-loader
+    restart: "no"
+    environment:
+      <<: *common-env
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_LOG_INDEX: ${OPENSEARCH_LOG_INDEX:-network-logs}
+      LOG_DIR: /logs
+    volumes:
+      - ../data/logs:/logs
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  # ----------------------------------------------------------
+  # Reference demo app (profile: demo)
+  # Runs the completed agent API and Chainlit UI on separate ports
+  # so it can sit side by side with the participant's own build.
+  # ----------------------------------------------------------
+  mcp-demo:
+    profiles: ["demo"]
+    build:
+      context: ..
+      dockerfile: docker/demo/Dockerfile
+    image: ai-mpls-workshop-demo:latest
+    container_name: mpls-demo
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      DEMO_MODE: ${DEMO_MODE:-live}
+      PRESENTER_MODE: ${PRESENTER_MODE:-true}
+      READ_ONLY: "true"
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-not-needed-for-local}
+      LLM_MODEL: ${LLM_MODEL:-gemma3:27b}
+      EMBEDDING_BASE_URL: ${EMBEDDING_BASE_URL:-http://host.docker.internal:11434/v1}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-embeddinggemma:300m}
+      PG_DSN: postgresql://${PG_READONLY_USER:-mcp_reader}:${PG_READONLY_PASSWORD:-mcp_reader_password}@postgres:5432/${PG_DATABASE:-mplsdb}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-neo4j_dev_password}
+      OPENSEARCH_URL: http://opensearch:9200
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+    ports:
+      - "8100:8000"   # Chainlit UI
+      - "8180:8080"   # Agent API
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+
+  # ----------------------------------------------------------
+  # Local model serving (profile: llm)
+  # Optional: use this only if you are not pointing at a shared
+  # GPU server. gemma3:27b will NOT run well on a laptop.
+  # ----------------------------------------------------------
+  ollama:
+    profiles: ["llm"]
+    image: ollama/ollama:latest
+    container_name: mpls-ollama
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      OLLAMA_KEEP_ALIVE: "24h"
+      OLLAMA_NUM_PARALLEL: "4"
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollamadata:/root/.ollama
+      - ./ollama:/scripts:ro
+
+  # Serves EmbeddingGemma and mxbai-rerank over an HTTP API.
+  infinity:
+    profiles: ["llm"]
+    image: michaelf34/infinity:latest
+    container_name: mpls-infinity
+    restart: unless-stopped
+    command: >
+      v2
+      --model-id google/embeddinggemma-300m
+      --model-id mixedbread-ai/mxbai-rerank-base-v2
+      --port 7997
+    ports:
+      - "7997:7997"
+    volumes:
+      - hfcache:/app/.cache
+
+volumes:
+  pgdata:
+  pgadmindata:
+  neo4jdata:
+  osdata:
+  ollamadata:
+  hfcache:

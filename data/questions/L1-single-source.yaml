@@ -1,0 +1,115 @@
+meta:
+  level: L1
+  title: คำถามที่ตอบได้จากแหล่งเดียว
+  purpose: >
+    ทดสอบว่า Agent เลือก tool ถูกตัวและกรอก argument ถูกต้อง
+    เป็นฐานของทุกอย่าง — ถ้า L1 ไม่ผ่าน ระดับบนไม่มีทางผ่าน
+  pass_criteria:
+    - เรียก tool ถูกกลุ่ม (postgres / neo4j / opensearch)
+    - ไม่เรียก tool เกินความจำเป็น
+    - คำตอบมีข้อมูลจริงจากฐานข้อมูล ไม่ใช่ความรู้ทั่วไปของโมเดล
+
+questions:
+  # ---------- PostgreSQL: Ticket + Config ----------
+  - id: Q06
+    question: "ticket ที่ยังไม่ปิดตอนนี้มีอะไรบ้าง เรียงตามความรุนแรง"
+    sources: [postgres]
+    expected_tools: [search_tickets]
+    expect:
+      must_cite: [postgres]
+      max_tool_calls: 2
+    used_in: [lab, test, eval]
+    difficulty: 1
+
+  - id: Q07
+    question: "ticket ของนนทบุรีในเดือนนี้มีกี่ใบ อะไรบ้าง"
+    sources: [postgres]
+    expected_tools: [search_tickets]
+    expect:
+      must_contain: ["NBI"]
+      time_window_days: 30
+      max_tool_calls: 2
+    used_in: [lab, test]
+    difficulty: 1
+
+  - id: Q08
+    question: "config ปัจจุบันของ PE-NBI-04 ตั้ง MTU ไว้เท่าไหร่"
+    scenario: S3
+    sources: [postgres]
+    expected_tools: [get_device_config]
+    expect:
+      must_contain: ["1500"]
+      max_tool_calls: 2
+    used_in: [lab, test, eval]
+    difficulty: 1
+    notes: "เป็นชิ้นส่วนแรกของ S3 — ยังไม่ต้องรู้ว่าผิด แค่ดึงค่ามาให้ถูก"
+
+  # ---------- Neo4j: Topology ----------
+  - id: Q09
+    question: "LPE-NBI-11 ต่ออยู่กับอุปกรณ์ตัวไหนบ้าง"
+    sources: [neo4j]
+    expected_tools: [get_device_neighbors]
+    expect:
+      must_contain: ["APE-NBI-03"]
+      must_cite: [neo4j]
+      max_tool_calls: 2
+    used_in: [lab, test, eval]
+    difficulty: 1
+
+  - id: Q10
+    question: "ถ้า APE-NBI-03 ล่ม จะกระทบอุปกรณ์อะไรบ้างที่อยู่ใต้มัน"
+    scenario: S1
+    sources: [neo4j]
+    expected_tools: [get_downstream_devices]
+    expect:
+      must_contain: ["LPE-NBI-11", "LPE-NBI-12", "LPE-NBI-13"]
+      max_tool_calls: 2
+    used_in: [lab, test, eval, demo]
+    difficulty: 2
+    notes: "เตรียมพื้นให้ผู้เรียนเข้าใจโครงสร้างก่อนเจอ Q21"
+
+  - id: Q11
+    question: "เส้นทางจาก LPE-NBI-11 ไปยัง Core ที่กรุงเทพผ่านอุปกรณ์อะไรบ้าง"
+    sources: [neo4j]
+    expected_tools: [get_path_between]
+    expect:
+      must_contain: ["APE-NBI-03", "PE-NBI-01", "CR-BKK-01"]
+      max_tool_calls: 2
+    used_in: [lab, test]
+    difficulty: 2
+
+  # ---------- OpenSearch: Log + Vector ----------
+  - id: Q12
+    question: "มี log ระดับ critical ในช่วง 24 ชั่วโมงที่ผ่านมาไหม"
+    sources: [opensearch]
+    expected_tools: [search_logs]
+    expect:
+      time_window_days: 1
+      must_cite: [opensearch]
+      max_tool_calls: 2
+    used_in: [lab, test]
+    difficulty: 1
+    notes: "ทดสอบว่าใช้ช่วงเวลาสัมพัทธ์กับ data_now ไม่ใช่นาฬิกาเครื่อง"
+
+  - id: Q13
+    question: "สัปดาห์นี้อุปกรณ์ตัวไหนมี log error เยอะที่สุด"
+    scenario: S2
+    sources: [opensearch]
+    expected_tools: [count_log_events]
+    expect:
+      must_contain: ["PE-BKK-02"]
+      time_window_days: 7
+      max_tool_calls: 2
+    used_in: [lab, test, eval]
+    difficulty: 2
+
+  - id: Q14
+    question: "เคยมีปัญหาแบบ ISIS adjacency ไม่ขึ้นมาก่อนไหม ตอนนั้นแก้ยังไง"
+    sources: [opensearch]
+    expected_tools: [search_docs_semantic]
+    expect:
+      must_cite: [opensearch]
+      max_tool_calls: 3
+    used_in: [lab, test, eval]
+    difficulty: 2
+    notes: "ทดสอบ semantic search บน network-docs — ไม่ใช่ keyword search"

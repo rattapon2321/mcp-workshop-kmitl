@@ -1,0 +1,99 @@
+meta:
+  level: L4
+  title: บทสนทนาต่อเนื่อง 10 turn
+  purpose: >
+    ทดสอบ Memory Management และ Intent Gate พร้อมกันในบริบทจริง
+    สิ่งที่วัดไม่ใช่แค่ "ตอบถูกไหม" แต่คือ "ขนาด context โตขึ้นเรื่อยๆ หรือถูกตัดเมื่อเปลี่ยนเรื่อง"
+  pass_criteria:
+    - turn ที่นอกขอบเขตต้องไม่เรียก tool และต้องไม่ทำลาย context เดิม
+    - turn ที่เปลี่ยนเรื่อง ขนาด context ต้อง "ลดลง" ไม่ใช่โตขึ้น
+    - turn สุดท้ายที่ย้อนกลับไปเรื่องเดิม ต้องตอบได้จากสรุปที่เก็บไว้
+  metrics_to_record:
+    - context_tokens ทุก turn
+    - topic_id ทุก turn
+    - tool_calls ทุก turn
+
+conversation:
+  id: CONV01
+  used_in: [challenge4, test, demo]
+  turns:
+    - turn: 1
+      question: "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง"
+      expect:
+        topic: "site:NBI"
+        topic_changed: false
+        min_tool_calls: 1
+
+    - turn: 2
+      question: "ใบแรกเกี่ยวกับอุปกรณ์ตัวไหน"
+      expect:
+        topic: "site:NBI"
+        topic_changed: false
+        uses_prior_context: true
+      notes: "อ้างอิงย้อนหลัง — ถ้าไม่มี memory จะถามกลับว่า 'ใบไหน'"
+
+    - turn: 3
+      question: "ตัวนั้นต่อกับอุปกรณ์อะไรบ้าง"
+      expect:
+        topic_changed: false
+        uses_prior_context: true
+        expected_tools: [get_device_neighbors]
+
+    - turn: 4
+      question: "แล้วมี log ผิดปกติไหม"
+      expect:
+        topic_changed: false
+        uses_prior_context: true
+        expected_tools: [search_logs]
+        must_contain: ["APE-NBI-03"]
+
+    - turn: 5
+      question: "ว่าแต่ แถวนี้มีร้านอาหารอร่อยๆ แนะนำไหม"
+      expect:
+        intent: out_of_scope
+        max_tool_calls: 0
+        topic_changed: false
+        context_preserved: true
+      notes: >
+        สำคัญมาก — นอกขอบเขตแต่ "ห้ามล้าง context"
+        เพราะผู้ใช้แค่แทรกคำถามเล่นๆ ไม่ได้เปลี่ยนเรื่องงาน
+
+    - turn: 6
+      question: "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเทพหน่อย"
+      expect:
+        topic: "site:BKK"
+        topic_changed: true
+        context_tokens_decreased: true
+        summary_created: true
+      notes: "จุดวัดผลหลัก — context ต้องเล็กลงหลัง turn นี้"
+
+    - turn: 7
+      question: "PE-BKK-02 เป็นยังไงบ้าง"
+      expect:
+        topic: "site:BKK"
+        topic_changed: false
+        must_contain: ["CRC"]
+
+    - turn: 8
+      question: "มี ticket ค้างอยู่ไหม"
+      expect:
+        topic_changed: false
+        uses_prior_context: true
+        must_not_contain: ["มี ticket ค้าง"]
+      notes: "คำตอบที่ถูกคือไม่มี — ตาม S2"
+
+    - turn: 9
+      question: "เมื่อกี้ที่คุยเรื่องนนทบุรี สรุปว่าอะไรเป็นสาเหตุ"
+      expect:
+        recalls_summary: true
+        must_contain: ["APE-NBI-03"]
+        max_tool_calls: 1
+      notes: >
+        จุดวัดผลที่สอง — ต้องตอบได้จาก "สรุป" ที่เก็บไว้ตอน turn 6
+        ไม่ใช่จาก detail ที่ทิ้งไปแล้ว และไม่ควรต้องค้นใหม่ทั้งหมด
+
+    - turn: 10
+      question: "ช่วยส่งสรุปทั้งหมดให้ทีม NOC ด้วย"
+      expect:
+        expected_tools: [generate_report, send_notification]
+        covers_both_topics: true

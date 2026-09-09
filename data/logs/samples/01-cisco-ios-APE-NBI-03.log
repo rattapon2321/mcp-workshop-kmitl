@@ -1,0 +1,14 @@
+Aug 23 01:14:02 APE-NBI-03: %LINK-3-UPDOWN: Interface Te0/1/2, changed state to down
+Aug 23 01:14:03 APE-NBI-03: %LINEPROTO-3-UPDOWN: Line protocol on Interface Te0/1/2, changed state to down
+Aug 23 01:14:04 APE-NBI-03: %ISIS-5-ADJCHANGE: Adjacency to PE-NBI-01 (Level-2) Down, interface Te0/1/2
+Aug 23 01:14:05 APE-NBI-03: %LDP-5-NBRCHG: LDP neighbor 10.20.1.1:0 is DOWN
+Aug 23 01:14:36 APE-NBI-03: %LINK-5-UPDOWN: Interface Te0/1/2, changed state to up
+Aug 23 01:14:37 APE-NBI-03: %LINEPROTO-5-UPDOWN: Line protocol on Interface Te0/1/2, changed state to up
+Aug 23 01:14:43 APE-NBI-03: %ISIS-5-ADJCHANGE: Adjacency to PE-NBI-01 (Level-2) Up, interface Te0/1/2
+Aug 23 01:14:47 APE-NBI-03: %LDP-6-NBRCHG: LDP neighbor 10.20.1.1:0 is UP
+Aug 23 03:41:18 APE-NBI-03: %LINK-3-UPDOWN: Interface Te0/1/2, changed state to down
+Aug 23 03:41:19 APE-NBI-03: %LINEPROTO-3-UPDOWN: Line protocol on Interface Te0/1/2, changed state to down
+Aug 23 03:41:52 APE-NBI-03: %LINK-5-UPDOWN: Interface Te0/1/2, changed state to up
+Aug 23 03:41:53 APE-NBI-03: %LINEPROTO-5-UPDOWN: Line protocol on Interface Te0/1/2, changed state to up
+Aug 23 06:02:44 APE-NBI-03: %SYS-6-CONFIG_I: Configured from console by admin
+Aug 23 07:55:10 APE-NBI-03: %ENV-4-TEMP: Inlet temperature 41C within normal range

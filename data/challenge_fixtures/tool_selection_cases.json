@@ -1,0 +1,71 @@
+{
+  "_readme": "Challenge 3: Tool Selection Accuracy",
+  "descriptions_under_test": {
+    "search_tickets": "ค้นหาและกรอง ticket ที่ถูกแจ้งเข้ามา\n\nใช้เมื่อ: อยากรู้ว่ามีอะไรถูก 'แจ้ง' เข้ามาบ้าง, รู้หมายเลข ticket, ถามหาสถานะ ticket, หรือหา 'เคสไหนที่ปิดไปแล้วแต่ลูกค้าเปิดใหม่ด้วยอาการเดิม'\n\nห้ามใช้เมื่อ: หาเคสที่ 'อาการคล้ายกัน' (ให้ใช้ semantic)",
+    "search_logs": "ค้นหา log ดิบที่อุปกรณ์รายงานออกมาจริง\n\nใช้เมื่อ: อยากเห็นว่า 'เกิดอะไรขึ้น' กับอุปกรณ์, มี log error ไหม, มีอะไร down ไหม, หรือถามว่า 'รีบูตไปกี่ครั้ง'\n\nห้ามใช้เมื่อ: อยากรู้ว่ามีใครแจ้งเรื่องนี้ไว้ไหม (ให้ใช้ search_tickets)",
+    "search_tickets_semantic": "ค้นหา ticket ในอดีตที่อธิบาย 'ปัญหาแบบเดียวกัน' โดยเทียบจากความหมาย\n\nใช้เมื่อ: หาแนวทางจากเคสเดิม เช่น 'เคยเจอแบบนี้ไหม', 'เคยมีปัญหาคล้ายๆ กับ...', หรือถามแนวทางปฏิบัติจากอดีตเช่น 'อาการแบบนี้เรามักจะให้ช่างเปลี่ยนอุปกรณ์เลยไหม'\n\nห้ามใช้เมื่อ: กรองด้วยสถานะ พื้นที่ (ให้ใช้ search_tickets)",
+    "search_docs_semantic": "ค้นหาเอกสารปฏิบัติการ ได้แก่ runbook, คู่มือ และ config\n\nใช้เมื่อ: ถามถึง 'ขั้นตอน', 'วิธีการ', 'มาตรฐาน', 'คู่มือ', หรือ 'ปกติเราทำยังไง'\n\nห้ามใช้เมื่อ: หาเคสที่เคยแจ้ง (ให้ใช้ search_tickets_semantic)"
+  },
+  "cases": [
+    {
+      "id": "TS-01",
+      "question": "มี ticket ค้างของ APE-NBI-03 ไหม",
+      "expected_tool": "search_tickets"
+    },
+    {
+      "id": "TS-02",
+      "question": "เมื่อคืนมี log CRC error แถวฝั่งธนไหม",
+      "expected_tool": "search_logs"
+    },
+    {
+      "id": "TS-03",
+      "question": "หาเคสเก่าที่ลูกค้ารายงานว่าเน็ตช้าเป็นพักๆ หน่อย",
+      "expected_tool": "search_tickets_semantic"
+    },
+    {
+      "id": "TS-04",
+      "question": "มาตรฐานการอัปเดต firmware ของอุปกรณ์รุ่น LPE คืออะไร",
+      "expected_tool": "search_docs_semantic"
+    },
+    {
+      "id": "TS-05",
+      "question": "ticket #1234 สถานะเป็นยังไงบ้าง",
+      "expected_tool": "search_tickets"
+    },
+    {
+      "id": "TS-06",
+      "question": "เมื่อกี้ LPE-BKK-05 มีอะไร down ไหม",
+      "expected_tool": "search_logs"
+    },
+    {
+      "id": "TS-07",
+      "question": "เคยมีปัญหาคล้ายๆ กับ routing loop เกิดขึ้นที่ไหนบ้าง",
+      "expected_tool": "search_tickets_semantic"
+    },
+    {
+      "id": "TS-08",
+      "question": "ขอคู่มือการ config BGP peer หน่อย",
+      "expected_tool": "search_docs_semantic"
+    },
+    {
+      "id": "TS-09",
+      "question": "สรุปยอด ticket ประเภท maintenance ของเดือนนี้",
+      "expected_tool": "search_tickets"
+    },
+    {
+      "id": "TS-10",
+      "question": "LPE-CNX-02 รีบูตไปกี่ครั้งในรอบสัปดาห์",
+      "expected_tool": "search_logs"
+    },
+    {
+      "id": "TS-11",
+      "question": "อาการแบบนี้เรามักจะให้ช่างเปลี่ยนอุปกรณ์เลยไหม",
+      "expected_tool": "search_tickets_semantic"
+    },
+    {
+      "id": "TS-12",
+      "question": "เคสไหนที่ปิดไปแล้วแต่ลูกค้าเปิดใหม่ด้วยอาการเดิม",
+      "expected_tool": "search_tickets"
+    }
+  ]
+}

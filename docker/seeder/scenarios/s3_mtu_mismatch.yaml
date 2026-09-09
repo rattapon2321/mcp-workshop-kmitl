@@ -1,0 +1,62 @@
+# ============================================================
+# S3 - Config drift across sites: PE-NBI-04 <-> CR-BKK-02
+#
+# Story: PE-NBI-04 was replaced recently and came back with the default
+# MTU of 1500 on its ISIS peer link. Its peer CR-BKK-02 uses 9000, so the
+# adjacency never establishes.
+#
+# Teaching point: logs describe the symptom, configuration explains the
+# cause. And because the peer sits at the OTHER site, an agent that scopes
+# its search to NBI will never see the mismatch.
+# ============================================================
+
+id: S3
+name: ISIS adjacency failure caused by MTU mismatch
+device: PE-NBI-04
+peer_device: CR-BKK-02
+interface: Te0/0/1
+total_lines: 180
+window_hours_ago: [168, 0]        # last 7 days
+
+# Retry roughly every 30 minutes.
+periodic:
+  interval_minutes: 30
+  jitter_minutes: 4
+
+templates:
+  - weight: 50
+    severity: warning
+    severity_num: 4
+    facility: ISIS
+    mnemonic: ADJREJECT
+    event_type: ISIS-ADJREJECT
+    message: "Rejected adjacency with CR-BKK-02 on {interface}: MTU mismatch (local 1500, remote 9000)"
+  - weight: 30
+    severity: notice
+    severity_num: 5
+    facility: ISIS
+    mnemonic: ADJCHANGE
+    event_type: ISIS-ADJCHANGE
+    message: "Adjacency to CR-BKK-02 (Level-2) Init -> Down on {interface}"
+  - weight: 20
+    severity: warning
+    severity_num: 4
+    facility: ISIS
+    mnemonic: HELLO
+    event_type: ISIS-HELLO
+    message: "Hello PDU from CR-BKK-02 dropped on {interface}: padded length 9000 exceeds interface MTU"
+
+# One ticket, opened by an engineer rather than a customer - no customer
+# traffic rides this link yet, so nobody outside noticed.
+tickets:
+  - device_id: PE-NBI-04
+    category: config
+    severity: medium
+    status: open
+    hours_ago: 160
+    title: "ISIS adjacency ไม่ขึ้นหลังเปลี่ยนอุปกรณ์"
+    description: "หลังเปลี่ยน PE-NBI-04 ตัวใหม่ adjacency ฝั่ง core ยังไม่ขึ้น ตรวจสอบ physical layer แล้วปกติ link up ทั้งสองฝั่ง"
+    messages:
+      - [engineer, "เปลี่ยนอุปกรณ์เสร็จแล้ว link up แต่ ISIS adjacency ยังไม่ขึ้นครับ"]
+      - [engineer, "ตรวจ physical แล้วปกติ optical power อยู่ในเกณฑ์ ขอให้ทีม core ช่วยดูฝั่ง CR ด้วยครับ"]
+      - [system, "Auto-check: interface Te0/0/1 admin up / oper up"]

@@ -1,0 +1,12 @@
+[2026-09-08 15:41:21] BLOCKED | Tool: read_report | Reason: FileNotFoundError | Detail: Not Found: ไม่พบไฟล์ 'q1_summary.csv' ในระบบ
+[2026-09-08 15:41:21] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ 'secret_budget.xlsx' ไม่อยู่ใน Allowlist
+[2026-09-08 15:41:21] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ '../etc/passwd' ไม่อยู่ใน Allowlist
+[2026-09-08 15:52:48] BLOCKED | Tool: read_report | Reason: FileNotFoundError | Detail: Not Found: ไม่พบไฟล์ 'q1_summary.csv' ในระบบ
+[2026-09-08 15:52:48] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ 'secret_budget.xlsx' ไม่อยู่ใน Allowlist
+[2026-09-08 15:52:48] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ '../etc/passwd' ไม่อยู่ใน Allowlist
+[2026-09-08 15:53:56] BLOCKED | Tool: read_report | Reason: FileNotFoundError | Detail: Not Found: ไม่พบไฟล์ 'q1_summary.csv' ในระบบ
+[2026-09-08 15:53:56] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ 'secret_budget.xlsx' ไม่อยู่ใน Allowlist
+[2026-09-08 15:53:56] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ '../etc/passwd' ไม่อยู่ใน Allowlist
+[2026-09-08 16:00:07] BLOCKED | Tool: read_report | Reason: FileNotFoundError | Detail: Not Found: ไม่พบไฟล์ 'q1_summary.csv' ในระบบ
+[2026-09-08 16:00:07] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ 'secret_budget.xlsx' ไม่อยู่ใน Allowlist
+[2026-09-08 16:00:07] BLOCKED | Tool: read_report | Reason: ValueError | Detail: Access Denied: ไฟล์ '../etc/passwd' ไม่อยู่ใน Allowlist

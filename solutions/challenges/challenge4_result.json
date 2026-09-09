@@ -1,0 +1,112 @@
+[
+  {
+    "turn": 1,
+    "message": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+    "tokens": 700,
+    "tools": 1,
+    "intent": "in_scope",
+    "changed": true,
+    "topic": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+    "archived": 0,
+    "problems": []
+  },
+  {
+    "turn": 2,
+    "message": "ใบแรกเกี่ยวกับอุปกรณ์ตัวไหน",
+    "tokens": 874,
+    "tools": 2,
+    "intent": "in_scope",
+    "changed": false,
+    "topic": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+    "archived": 0,
+    "problems": []
+  },
+  {
+    "turn": 3,
+    "message": "ตัวนั้นต่อกับอุปกรณ์อะไรบ้าง",
+    "tokens": 1032,
+    "tools": 1,
+    "intent": "in_scope",
+    "changed": false,
+    "topic": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+    "archived": 0,
+    "problems": []
+  },
+  {
+    "turn": 4,
+    "message": "แล้วมี log ผิดปกติไหม",
+    "tokens": 1651,
+    "tools": 1,
+    "intent": "in_scope",
+    "changed": false,
+    "topic": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+    "archived": 0,
+    "problems": []
+  },
+  {
+    "turn": 5,
+    "message": "ว่าแต่ แถวนี้มีร้านอาหารอร่อยๆ แนะนำไหม",
+    "tokens": 1651,
+    "tools": 0,
+    "intent": "out_of_scope",
+    "changed": false,
+    "topic": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+    "archived": 0,
+    "problems": []
+  },
+  {
+    "turn": 6,
+    "message": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเทพหน่อย",
+    "tokens": 297,
+    "tools": 1,
+    "intent": "in_scope",
+    "changed": true,
+    "topic": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเท",
+    "archived": 1,
+    "problems": []
+  },
+  {
+    "turn": 7,
+    "message": "PE-BKK-02 เป็นยังไงบ้าง",
+    "tokens": 618,
+    "tools": 2,
+    "intent": "in_scope",
+    "changed": false,
+    "topic": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเท",
+    "archived": 1,
+    "problems": []
+  },
+  {
+    "turn": 8,
+    "message": "มี ticket ค้างอยู่ไหม",
+    "tokens": 955,
+    "tools": 1,
+    "intent": "in_scope",
+    "changed": false,
+    "topic": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเท",
+    "archived": 1,
+    "problems": []
+  },
+  {
+    "turn": 9,
+    "message": "แล้วตอนนี้ PE-BKK-02 สถานะเป็นยังไงบ้าง",
+    "tokens": 1334,
+    "tools": 3,
+    "intent": "in_scope",
+    "changed": false,
+    "topic": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเท",
+    "archived": 1,
+    "problems": []
+  },
+  {
+    "turn": 10,
+    "message": "ช่วยส่งสรุปทั้งหมดให้ทีม NOC ด้วย",
+    "tokens": 1334,
+    "tools": 0,
+    "intent": "needs_clarification",
+    "changed": false,
+    "topic": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเท",
+    "archived": 1,
+    "problems": []
+  }
+]

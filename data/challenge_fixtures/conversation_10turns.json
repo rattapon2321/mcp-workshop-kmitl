@@ -1,0 +1,91 @@
+{
+  "id": "CONV01",
+  "_readme": "ใช้กับโจทย์ที่ 4 และ tests/test_topic_shift.py",
+  "turns": [
+    {
+      "turn": 1,
+      "message": "ticket ที่ยังไม่ปิดของนนทบุรีมีอะไรบ้าง",
+      "expect": {
+        "topic_changed": true,
+        "min_tool_calls": 1,
+        "note": "เริ่มหัวข้อแรก"
+      }
+    },
+    {
+      "turn": 2,
+      "message": "ใบแรกเกี่ยวกับอุปกรณ์ตัวไหน",
+      "expect": {
+        "topic_changed": false,
+        "uses_prior_context": true
+      }
+    },
+    {
+      "turn": 3,
+      "message": "ตัวนั้นต่อกับอุปกรณ์อะไรบ้าง",
+      "expect": {
+        "topic_changed": false,
+        "uses_prior_context": true
+      }
+    },
+    {
+      "turn": 4,
+      "message": "แล้วมี log ผิดปกติไหม",
+      "expect": {
+        "topic_changed": false
+      }
+    },
+    {
+      "turn": 5,
+      "message": "ว่าแต่ แถวนี้มีร้านอาหารอร่อยๆ แนะนำไหม",
+      "expect": {
+        "intent": "out_of_scope",
+        "max_tool_calls": 0,
+        "topic_changed": false,
+        "context_preserved": true,
+        "note": "จุดที่คนพลาดมากที่สุด - นอกขอบเขตแต่ห้ามล้าง context"
+      }
+    },
+    {
+      "turn": 6,
+      "message": "เปลี่ยนเรื่อง ขอดูสถานะอุปกรณ์ฝั่งกรุงเทพหน่อย",
+      "expect": {
+        "topic_changed": true,
+        "context_tokens_decreased": true,
+        "summary_created": true,
+        "note": "จุดวัดผลหลัก"
+      }
+    },
+    {
+      "turn": 7,
+      "message": "PE-BKK-02 เป็นยังไงบ้าง",
+      "expect": {
+        "topic_changed": false
+      }
+    },
+   {
+      "turn": 8,
+      "message": "มี ticket ค้างอยู่ไหม",
+      "expect": {
+        "topic_changed": false
+      }
+    },
+    {
+      "turn": 9,
+      "message": "แล้วตอนนี้ PE-BKK-02 สถานะเป็นยังไงบ้าง",
+      "expect": {
+        "topic_changed": false
+      }
+    },
+    {
+      "turn": 10,
+      "message": "ช่วยส่งสรุปทั้งหมดให้ทีม NOC ด้วย",
+      "expect": {
+        "expected_tools": [
+          "generate_report",
+          "send_notification"
+        ],
+        "covers_both_topics": true
+      }
+    }
+  ]
+}

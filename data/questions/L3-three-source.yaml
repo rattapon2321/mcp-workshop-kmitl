@@ -1,0 +1,103 @@
+meta:
+  level: L3
+  title: คำถามที่ต้องใช้ครบทั้งสามแหล่ง
+  purpose: >
+    ระดับสูงสุดของงานวินิจฉัย — Agent ต้องวางแผนที่มี dependency หลายชั้น
+    และต้องสังเคราะห์คำตอบจากข้อมูลต่างชนิดกันให้เป็นเรื่องเดียว พร้อมอ้างอิงแหล่งที่มา
+  pass_criteria:
+    - ใช้ครบทั้ง 3 แหล่ง
+    - plan ต้องมี dependency (ขั้นหลังใช้ผลของขั้นก่อน) ไม่ใช่ยิงขนานมั่ว
+    - คำตอบต้องระบุ root cause ไม่ใช่แค่สรุปข้อมูลที่ดึงมา
+    - ต้องมี citation ว่าข้อสรุปแต่ละข้อมาจากแหล่งไหน
+
+questions:
+  - id: Q21
+    question: "ทำไมช่วงสองสัปดาห์นี้ถึงมีลูกค้าแจ้งเน็ตหลุดซ้ำๆ หลายราย"
+    scenario: S1
+    sources: [postgres, neo4j, opensearch]
+    expected_tools:
+      - search_tickets
+      - get_upstream_devices
+      - search_logs
+    expected_plan_shape:
+      - step: 1
+        tool: search_tickets
+        why: หา ticket ในช่วง 14 วันเพื่อรู้ว่ามีใครแจ้งบ้าง
+        depends_on: []
+      - step: 2
+        tool: get_upstream_devices
+        why: เอาอุปกรณ์จาก ticket ไปหาจุดร่วมใน topology
+        depends_on: [1]
+      - step: 3
+        tool: search_logs
+        why: ตรวจ log ของจุดร่วมในช่วงเวลาเดียวกับ ticket
+        depends_on: [2]
+    expect:
+      must_contain: ["APE-NBI-03"]
+      must_not_contain: ["ไม่ทราบสาเหตุ"]
+      must_cite: [postgres, neo4j, opensearch]
+      time_window_days: 14
+      max_tool_calls: 8
+    used_in: [demo, challenge6, eval, test]
+    difficulty: 3
+    notes: >
+      คำถามหลักของทั้งหลักสูตร ใช้เป็นคำถามที่ 2 ในสคริปต์เดโม
+      ตั้งใจไม่ใบ้ชื่อพื้นที่ — Agent ต้องค้นพบเองว่าปัญหากระจุกที่ NBI
+      กับดัก: ticket ไม่มีคำว่า APE อยู่เลย ถ้าดูแค่ ticket จะสรุปว่าเป็นปัญหาฝั่งลูกค้า
+
+  - id: Q22
+    question: "ticket ที่ยังไม่ปิดทั้งหมด ใบไหนน่าจะมีสาเหตุร่วมกันบ้าง"
+    scenario: S1
+    sources: [postgres, neo4j, opensearch]
+    expected_tools: [search_tickets, get_upstream_devices, search_logs]
+    expect:
+      must_contain: ["APE-NBI-03"]
+      must_cite: [postgres, neo4j]
+      max_tool_calls: 8
+    used_in: [challenge6, eval, test]
+    difficulty: 3
+    notes: "เวอร์ชันเปิดกว้างของ Q21 — ไม่บอกแม้แต่ว่าเป็นเรื่องเน็ตหลุด"
+
+  - id: Q23
+    question: "สรุปสถานการณ์โครงข่ายภาพรวมตอนนี้ให้หน่อย มีอะไรต้องรีบจัดการบ้าง"
+    scenario: S1, S2, S4
+    sources: [opensearch, neo4j, postgres]
+    expected_tools: [count_log_events, search_tickets, calculate_health_score]
+    expect:
+      must_contain: ["APE-NBI-03", "PE-BKK-02"]
+      must_not_contain: ["APE-BKK-05 เหตุเสีย"]
+      max_tool_calls: 10
+    used_in: [demo, eval, test]
+    difficulty: 3
+    notes: >
+      คำถามที่รวม 3 เหตุการณ์ไว้ด้วยกัน และมีกับดัก S4 ซ่อนอยู่
+      Agent ต้องแยกให้ออกว่า APE-BKK-05 ไม่ใช่เหตุเสีย แต่เป็น maintenance
+
+  - id: Q24
+    question: "ถ้าจะปิด APE-NBI-03 เพื่อซ่อม จะกระทบลูกค้ากี่ราย ใครบ้าง แล้วมี ticket ค้างอยู่ไหม"
+    scenario: S1
+    sources: [neo4j, postgres]
+    expected_tools: [get_downstream_devices, get_circuits_by_device, search_tickets]
+    expect:
+      must_contain: ["LPE-NBI-11", "LPE-NBI-12", "LPE-NBI-13"]
+      must_cite: [neo4j, postgres]
+      max_tool_calls: 8
+    used_in: [demo, eval, test]
+    difficulty: 3
+    notes: >
+      คำถามที่ผู้บริหารอยากได้จริง — ต้องตอบถึงระดับ segment ลูกค้า
+      (Enterprise / SME / Government) และประเภทวงจร
+
+  - id: Q25
+    question: "ช่วยทำรายงานสรุปปัญหาสัปดาห์นี้ แล้วส่งให้ทีม NOC หน่อย"
+    scenario: S1, S2
+    sources: [postgres, neo4j, opensearch]
+    expected_tools: [search_tickets, count_log_events, generate_report, send_notification]
+    expect:
+      must_cite: [postgres, opensearch]
+      max_tool_calls: 10
+    used_in: [workshop2, challenge6, test]
+    difficulty: 3
+    notes: >
+      ครบ 3 ความสามารถตามหลักสูตร Workshop 2: ค้นหา + แปลงไฟล์ + ส่งอีเมล
+      ตรวจผลได้ที่ MailHog http://localhost:8025

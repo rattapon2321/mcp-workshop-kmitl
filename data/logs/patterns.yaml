@@ -1,0 +1,78 @@
+# ============================================================
+# Log parsing patterns
+#
+# Add a new vendor format by adding an entry here. No Python changes needed.
+# Patterns are tried in order; the first one that matches wins.
+#
+# Required named groups:
+#   ts   - timestamp text
+#   msg  - human readable message
+# Optional named groups:
+#   host, facility, sev, mnemonic, interface
+#
+# Lines that match nothing are still indexed, tagged parse_status: failed,
+# and copied to data/logs/failed/. Silent data loss is worse than bad data.
+# ============================================================
+
+patterns:
+
+  - name: cisco_ios_syslog
+    description: "Classic Cisco IOS / IOS-XR syslog line"
+    example: "Aug 23 14:02:11 APE-NBI-03: %LINK-3-UPDOWN: Interface Te0/1/2, changed state to down"
+    regex: >-
+      ^(?P<ts>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+
+      (?P<host>[\w.-]+):\s+
+      %(?P<facility>[A-Z0-9_]+)-(?P<sev>\d)-(?P<mnemonic>[A-Z0-9_]+):\s+
+      (?P<msg>.*)$
+    timestamp_format: "%b %d %H:%M:%S"
+    timestamp_missing_year: true
+
+  - name: huawei_syslog
+    description: "Huawei VRP log format"
+    example: "Aug 23 2025 14:02:11 PE-BKK-02 %%01IFNET/4/LINK_STATE(l)[123]:Interface Te0/1/0/2 turns into DOWN state"
+    regex: >-
+      ^(?P<ts>\w{3}\s+\d{1,2}\s+\d{4}\s+\d{2}:\d{2}:\d{2})\s+
+      (?P<host>[\w.-]+)\s+
+      %%\d+(?P<facility>[A-Z0-9]+)/(?P<sev>\d)/(?P<mnemonic>[A-Z0-9_]+)
+      \([a-z]\)\[\d+\]:\s*(?P<msg>.*)$
+    timestamp_format: "%b %d %Y %H:%M:%S"
+
+  - name: rfc5424_syslog
+    description: "RFC 5424 structured syslog, common from modern collectors"
+    example: "<134>1 2025-08-23T14:02:11+07:00 CR-BKK-01 isis 2841 ADJCHANGE - Adjacency Up"
+    regex: >-
+      ^<\d+>\d\s+
+      (?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[+-]\d{2}:\d{2}|Z))\s+
+      (?P<host>[\w.-]+)\s+
+      (?P<facility>[\w-]+)\s+\S+\s+
+      (?P<mnemonic>[\w-]+)\s+\S+\s+
+      (?P<msg>.*)$
+    timestamp_format: iso8601
+
+  - name: iso_simple
+    description: "Minimal ISO timestamp + host + message, used by some scripts"
+    example: "2025-08-23T14:02:11+07:00 LPE-NBI-11 link down on Ge0/0/1"
+    regex: >-
+      ^(?P<ts>\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:[+-]\d{2}:\d{2}|Z)?)\s+
+      (?P<host>[\w.-]+)\s+
+      (?P<msg>.*)$
+    timestamp_format: iso8601
+
+# Map the numeric syslog severity onto the names used in the index mapping.
+severity_map:
+  "0": critical
+  "1": critical
+  "2": critical
+  "3": error
+  "4": warning
+  "5": notice
+  "6": info
+  "7": debug
+
+# Pulled out of the message body when present, so logs can be filtered
+# by interface without a full-text search.
+interface_regex: "\\b((?:Te|Gi|Ge|Hu|Fa|Eth|Xe)[\\d/.:]+)\\b"
+
+# Device id is normally the syslog host. If a file has no host field,
+# the loader falls back to the filename.
+device_from_filename_regex: "((?:CR|PE|APE|LPE)-[A-Z]{3}-\\d{2})"

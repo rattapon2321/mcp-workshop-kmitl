@@ -1,0 +1,26 @@
+[project]
+enable_telemetry = false
+session_timeout = 3600
+user_env = []
+
+[features]
+prompt_playground = false
+unsafe_allow_html = false
+latex = false
+auto_tag_thread = true
+
+[features.spontaneous_file_upload]
+enabled = false
+
+[UI]
+name = "NT Network Assistant"
+description = "ผู้ช่วยดูแลโครงข่าย IP-MPLS - AI x MPLS Workshop"
+default_collapse_content = true
+cot = "full"
+github = ""
+
+[UI.theme]
+default = "dark"
+
+[meta]
+generated_by = "ai-mpls-workshop"

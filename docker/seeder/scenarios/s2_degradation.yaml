@@ -1,0 +1,56 @@
+# ============================================================
+# S2 - Silent degradation on PE-BKK-02
+#
+# Story: CRC errors and CPU pressure climb steadily for a month.
+# No customer notices yet, so there is NO ticket at all - which is the
+# whole point. An agent that only reads tickets sees a healthy network.
+#
+# The signal is the TREND, not the total. An agent that counts errors
+# over the whole window ranks other devices higher.
+# ============================================================
+
+id: S2
+name: Silent degradation on PE-BKK-02
+device: PE-BKK-02
+interface: Te0/1/0/2
+total_lines: 280
+window_hours_ago: [720, 0]
+
+# Event rate ramps from `start_per_day` to `end_per_day` across the window.
+ramp:
+  start_per_day: 2
+  end_per_day: 25
+  curve: exponential
+
+templates:
+  - weight: 55
+    severity: warning
+    severity_num: 4
+    facility: LINEPROTO
+    mnemonic: CRC
+    event_type: LINEPROTO-CRC
+    message: "Interface {interface}: {crc_count} input CRC errors in last 5 minutes"
+  - weight: 25
+    severity: warning
+    severity_num: 4
+    facility: SYS
+    mnemonic: CPUHOG
+    event_type: SYS-CPUHOG
+    message: "CPU utilisation {cpu}% exceeds threshold 70% for process fib_mgr"
+  - weight: 12
+    severity: warning
+    severity_num: 4
+    facility: ENV
+    mnemonic: TEMP
+    event_type: ENV-TEMP
+    message: "Inlet temperature {temp}C above nominal"
+  - weight: 8
+    severity: error
+    severity_num: 3
+    facility: PLATFORM
+    mnemonic: DROP
+    event_type: PLATFORM-DROP
+    message: "Packet drops observed on {interface}, queue depth exceeded"
+
+# Deliberately empty. Do not add tickets for PE-BKK-02.
+tickets: []

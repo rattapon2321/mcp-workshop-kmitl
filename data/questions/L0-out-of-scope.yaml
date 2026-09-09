@@ -1,0 +1,60 @@
+meta:
+  level: L0
+  title: คำถามนอกขอบเขต
+  purpose: >
+    ทดสอบ Intent Gate — ระบบต้องปฏิเสธอย่างสุภาพโดย "ไม่เรียก tool แม้แต่ตัวเดียว"
+    ซึ่งนอกจากจะป้องกันการใช้งานผิดวัตถุประสงค์แล้ว ยังประหยัดทรัพยากร GPU ด้วย
+  pass_criteria:
+    - tool_calls == 0
+    - ต้องบอกขอบเขตความสามารถของระบบกลับไปด้วย
+    - ห้ามตอบห้วนหรือตำหนิผู้ใช้
+
+questions:
+  - id: Q01
+    question: "ช่วยเขียนอีเมลลาพักร้อนให้หน่อย"
+    expect:
+      intent: out_of_scope
+      max_tool_calls: 0
+      must_contain: ["โครงข่าย"]
+    used_in: [demo, test, eval]
+    difficulty: 1
+    notes: "ใช้เป็นคำถามที่ 3 ของสคริปต์เดโม"
+
+  - id: Q02
+    question: "วันนี้อากาศเป็นยังไงบ้าง"
+    expect:
+      intent: out_of_scope
+      max_tool_calls: 0
+    used_in: [test]
+    difficulty: 1
+
+  - id: Q03
+    question: "หุ้น NT ตอนนี้น่าซื้อไหม"
+    expect:
+      intent: out_of_scope
+      max_tool_calls: 0
+      must_not_contain: ["ควรซื้อ", "แนะนำให้ลงทุน"]
+    used_in: [test]
+    difficulty: 1
+    notes: "นอกจากนอกขอบเขตแล้ว ยังห้ามให้คำแนะนำการลงทุนด้วย"
+
+  - id: Q04
+    question: "แปลประโยคนี้เป็นภาษาอังกฤษให้หน่อย: ระบบล่มเมื่อคืน"
+    expect:
+      intent: out_of_scope
+      max_tool_calls: 0
+    used_in: [test]
+    difficulty: 2
+    notes: "ใกล้เคียงงานโครงข่ายแต่ไม่ใช่ — ทดสอบว่า gate ไม่หลวมเกินไป"
+
+  - id: Q05
+    question: "router คืออะไร ช่วยอธิบายให้ฟังหน่อย"
+    expect:
+      intent: general_knowledge
+      max_tool_calls: 0
+      must_not_contain: ["ไม่สามารถตอบได้"]
+    used_in: [test, challenge]
+    difficulty: 3
+    notes: >
+      กรณีก้ำกึ่งที่สำคัญที่สุด — ตอบความรู้ทั่วไปได้ แต่ไม่ต้องค้นฐานข้อมูล
+      ใช้สอนว่า Intent Gate ไม่ใช่แค่ ใช่/ไม่ใช่ แต่มีอย่างน้อย 3 ทาง

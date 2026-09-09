@@ -1,0 +1,75 @@
+# ============================================================
+# S4 - Planned maintenance on APE-BKK-05
+#
+# Story: a firmware upgrade window generates a burst of severe-looking
+# logs in the middle of the night. It looks exactly like a major outage.
+# It is not: there is a maintenance ticket covering the exact window.
+#
+# This is the most dangerous class of hallucination in this dataset,
+# because the evidence is real - only the interpretation is wrong.
+# An agent must check tickets before calling something an incident.
+# ============================================================
+
+id: S4
+name: Planned firmware upgrade on APE-BKK-05
+device: APE-BKK-05
+total_lines: 150
+window_hours_ago: [76, 68]        # a single 8-hour night, ~3 days ago
+
+burst_window: true                # all lines concentrated in this window
+
+templates:
+  - weight: 30
+    severity: critical
+    severity_num: 2
+    facility: SYS
+    mnemonic: RELOAD
+    event_type: SYS-RELOAD
+    message: "System reload requested by admin - reason: firmware upgrade"
+  - weight: 25
+    severity: error
+    severity_num: 3
+    facility: LINK
+    mnemonic: UPDOWN
+    event_type: LINK-UPDOWN
+    message: "Interface {interface}, changed state to down"
+  - weight: 20
+    severity: notice
+    severity_num: 5
+    facility: ISIS
+    mnemonic: ADJCHANGE
+    event_type: ISIS-ADJCHANGE
+    message: "Adjacency to PE-BKK-02 (Level-2) Down"
+  - weight: 15
+    severity: notice
+    severity_num: 5
+    facility: SYS
+    mnemonic: RESTART
+    event_type: SYS-RESTART
+    message: "System restarted, image version V800R011C10SPC300"
+  - weight: 10
+    severity: info
+    severity_num: 6
+    facility: ISIS
+    mnemonic: ADJCHANGE
+    event_type: ISIS-ADJCHANGE
+    message: "Adjacency to PE-BKK-02 (Level-2) Up"
+
+# The maintenance ticket MUST cover the same window as the log burst.
+# The seeder asserts this - if the windows drift apart the scenario breaks.
+tickets:
+  - device_id: APE-BKK-05
+    category: maintenance
+    severity: low
+    status: closed
+    hours_ago: 100
+    closed_after_hours: 32
+    resolution: "ดำเนินการอัปเกรด firmware เรียบร้อย ระบบกลับมาปกติ ตรวจสอบ adjacency ครบทุกเส้นแล้ว"
+    title: "แผนงานอัปเกรด firmware APE-BKK-05"
+    description: "งานบำรุงรักษาตามแผน อัปเกรด firmware เป็น V800R011C10SPC300 หน้าต่างงาน 22:00-02:00 แจ้งลูกค้าที่เกี่ยวข้องล่วงหน้า 7 วัน คาดว่ามี downtime ช่วงสั้นระหว่าง reload"
+    covers_log_window: true
+    messages:
+      - [engineer, "แจ้งแผนงาน maintenance window 22:00-02:00 ครับ"]
+      - [system, "Maintenance window opened"]
+      - [system, "Maintenance window closed"]
+      - [engineer, "อัปเกรดเสร็จเรียบร้อย ตรวจสอบ adjacency ทุกเส้นกลับมา Up ปกติครับ"]
