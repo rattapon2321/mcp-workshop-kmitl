@@ -17,7 +17,12 @@ LLM_BASE_URL=https://openrouter.ai/api/v1
 LLM_API_KEY=sk-or-v1-***Your Key***
 LLM_MODEL=openai/gpt-4o-mini
 ```
-
+จุดที่ต้องใส่ Key
+`apps/agent-api/agent/llm.py`
+`cosine.py`
+`scripts/embed_devices.py`
+`solutions/day2/workshop2_agent.py`
+`test_api.py`
 ```bash
 docker compose -f docker/docker-compose.yml --env-file .env up -d 
 ```
