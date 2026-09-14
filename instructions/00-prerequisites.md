@@ -70,11 +70,7 @@ curl.exe -s "https://openrouter.ai/api/v1/models" -H "Authorization: Bearer sk-o
 ## 4. เตรียม repo และดึง image ล่วงหน้า
 
 ```bash
-<<<<<<< HEAD
 git clone ***Your URL***
-=======
-git clone https://github.com/LLM-CE-KMITL/mcp-workshop.git && cd mcp-workshop
->>>>>>> 67a16f02d54c7de762df1daf2b7c540cc9624ccf
 ```
 
 ```bash
