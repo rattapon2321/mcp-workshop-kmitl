@@ -13,7 +13,7 @@
 | ลำดับ | เอกสาร | ใช้ทำอะไร |
 |---|---|---|
 | 1 | [00-prerequisites.md](instructions/00-prerequisites.md) | สิ่งที่ต้องเตรียมตัวก่อนมาเรียน |
-| 2 | [00-setup.md](instructions/00-setup.md) | ติดตั้งและตรวจสอบระบบด้วยตัวเอง (`make up && make verify`) |
+| 2 | [00-setup.md](instructions/00-setup.md) | ติดตั้งและตรวจสอบระบบด้วยตัวเอง |
 | 3 | [00-architecture.md](instructions/00-architecture.md) | ภาพรวมสถาปัตยกรรม + ตารางเวลาเต็ม 3 วัน |
 
 ---
