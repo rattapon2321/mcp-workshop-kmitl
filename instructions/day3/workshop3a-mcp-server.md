@@ -50,7 +50,7 @@ apps/mcp-server/
 
 ## ขั้นที่ 2 · Resource Setup (20 นาที)
 
-### 2.1 เปิด schema ให้ AI อ่าน
+### 2.1 เปิด schema ให้ AI อ่าน apps/mcp-server/resources/schemas.py
 
 ```python
 @mcp.resource("schema://postgres")
@@ -62,7 +62,7 @@ def postgres_schema() -> str:
 
 **ทำไมต้องมี comment** — comment ในฐานข้อมูลคือคำอธิบายที่โมเดลใช้ตัดสินใจ ถ้า column ชื่อ `mtu` ไม่มี comment โมเดลอาจไม่รู้ว่ามันสำคัญกับ adjacency
 
-### 2.2 `clock://now`
+### 2.2 `clock://now`apps/mcp-server/resources/clock_resource.py
 
 ```python
 @mcp.resource("clock://now")
@@ -72,7 +72,7 @@ def now() -> str:
 
 **ทดสอบ**: ถามระบบว่า *"log ปีที่แล้วเป็นยังไง"* — ต้องตอบว่าข้อมูลมีแค่ 30 วัน ไม่ใช่แต่งขึ้น
 
-### 2.3 ระบบไฟล์จำลอง
+### 2.3 ระบบไฟล์จำลอง apps/mcp-server/resources/files.py
 
 ```python
 @mcp.resource("files://index")
