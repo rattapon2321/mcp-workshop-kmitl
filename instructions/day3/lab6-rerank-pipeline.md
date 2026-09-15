@@ -62,7 +62,7 @@ flowchart LR
 docker compose -f docker/docker-compose.yml --profile llm up -d infinity
 ```
 
-### 2. ต่อเข้ากับ `search_docs_semantic` apps/mcp-server/tools/logs.py
+### 2. ต่อเข้ากับ `search_docs_semantic` apps/mcp-server/tools/logs.py ประมาณบรรทัดที่ 190
 
 ```python
 @mcp.tool(
