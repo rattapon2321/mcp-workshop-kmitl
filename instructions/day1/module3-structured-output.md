@@ -131,7 +131,7 @@ flowchart TD
 
 **หัวใจคือขั้น D** — การลองใหม่เฉยๆ มักได้ผลผิดแบบเดิม แต่การบอกว่าผิดตรงไหนทำให้โมเดลแก้ถูก
 
-ดูโค้ดจริงใน `complete_structured()`:
+ดูโค้ดจริงใน `complete_structured()`: apps/agent-api/agent/llm.py
 
 ```python
 conversation += [
