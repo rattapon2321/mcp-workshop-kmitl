@@ -23,9 +23,9 @@ flowchart LR
 เมื่อวาน agent เรียกฟังก์ชัน Python ตรงๆ วันนี้ต้องเรียกผ่าน MCP apps/agent-api/agent/executor.py
 
 ```python
-                result = await asyncio.wait_for(
-                    client.call_tool(step.tool, arguments),
-                    timeout=STEP_TIMEOUT_SECONDS,
+result = await asyncio.wait_for(
+    client.call_tool(step.tool, arguments),
+    timeout=STEP_TIMEOUT_SECONDS,
 ```
 
 **สิ่งที่ได้มาฟรีจากการเปลี่ยน**: tool ชุดเดียวกันนี้ใช้ได้กับ Claude Desktop ทันทีโดยไม่ต้องเขียนอะไรเพิ่ม
