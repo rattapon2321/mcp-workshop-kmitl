@@ -143,6 +143,7 @@ docker compose -f docker/docker-compose.yml --profile llm up -d infinity
         })
 ```
 รันระบบ
+
 `Get-NetTCPConnection -LocalPort 9000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }; uv run python apps/mcp-server/server.py`
 ### 3. วัดผล
 
