@@ -65,8 +65,82 @@ docker compose -f docker/docker-compose.yml --profile llm up -d infinity
 ### 2. ต่อเข้ากับ `search_docs_semantic` apps/mcp-server/tools/logs.py
 
 ```python
-passages = retrieve(query, k=50)          # ดึงกว้าง
-top = await rerank(query, passages, top_k=5)   # เหลือน้อยแต่ตรง
+@mcp.tool(
+        annotations={"title": "Search runbooks and configs by meaning",
+                     "readOnlyHint": True, "idempotentHint": True, "openWorldHint": False}
+    )
+    async def search_docs_semantic(query: str, limit: int = 5,
+                                   source_type: str | None = None) -> dict:
+        """Search operational documentation by meaning: runbooks and device configs.
+
+        Use for "how do we normally handle this", "has this been documented",
+        and for procedure lookups. The documents are written by engineers, so
+        ask in terms of the technical symptom rather than the customer wording.
+
+        Do NOT use this to find out what happened - that is search_logs. This
+        tool returns knowledge, not events.
+
+        Args:
+            query: natural language description of the problem or procedure
+            limit: how many chunks to return
+            source_type: runbook | config
+        """
+        limit = guardrails.clamp_limit(limit, "search_docs_semantic", ceiling=20)
+        index = settings().doc_index
+        vector = embed_query(query)
+
+        filters = [{"term": {"source_type": source_type}}] if source_type else []
+
+        # 1. กำหนดขนาดการดึงข้อมูลแบบกว้าง (Retrieve widely: 50 รายการ)
+        retrieval_limit = 50
+
+        if vector is None:
+            body = {
+                "size": retrieval_limit,
+                "query": {"bool": {"must": [{"match": {"content": query}}],
+                                   "filter": filters}},
+            }
+            response = opensearch().search(index=index, body=body)
+            passages = [
+                {
+                    "title": h["_source"]["title"],
+                    "source_type": h["_source"].get("source_type"),
+                    "device_id": h["_source"].get("device_id"),
+                    "content": h["_source"]["content"],
+                    "score": h["_score"]
+                }
+                for h in response["hits"]["hits"]
+            ]
+        else:
+            knn: dict = {"embedding": {"vector": vector, "k": retrieval_limit}}
+            if filters:
+                knn["embedding"]["filter"] = {"bool": {"filter": filters}}
+            response = opensearch().search(
+                index=index, body={"size": retrieval_limit, "query": {"knn": knn}}
+            )
+            hits = response["hits"]["hits"]
+            if not hits:
+                return {"method": "vector", "results": [],
+                        "note": "ยังไม่มี embedding ใน network-docs ให้รัน make reseed"}
+
+            passages = [
+                {
+                    "title": h["_source"]["title"],
+                    "source_type": h["_source"].get("source_type"),
+                    "device_id": h["_source"].get("device_id"),
+                    "content": h["_source"]["content"],
+                    "score": h["_score"],
+                }
+                for h in hits
+            ]
+
+        # 2. ส่งเข้าฟังก์ชัน rerank เพื่อจัดอันดับใหม่และคัดให้เหลือจำนวนเท่ากับ limit
+        top = await rerank(query, passages, top_k=limit)
+
+        return guardrails.redact_deep({
+            "method": "semantic_reranked",
+            "results": top,
+        })
 ```
 
 ### 3. วัดผล
