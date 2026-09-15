@@ -79,10 +79,20 @@ EOF
 
 ```python
 from agent import tokenizer
-for chunk in chunks:
-    n = tokenizer.count(chunk)
-    if n > 512:
-        print(f"WARNING: chunk ยาว {n} tokens")
+
+MAX_TOKENS_PER_CHUNK = 512
+
+# ใช้ enumerate เพื่อให้รู้ว่ากำลังเช็ค Chunk ลำดับที่เท่าไหร่
+for idx, chunk in enumerate(chunks):
+    
+    # นับจำนวน token ของ chunk ปัจจุบัน
+    n_tokens = tokenizer.count(chunk)
+    
+    # ตรวจสอบเงื่อนไขว่าเกิน 512 หรือไม่
+    if n_tokens > MAX_TOKENS_PER_CHUNK:
+        print(f"  ⚠️ WARNING: Chunk #{idx} ยาว {n_tokens} tokens (เกินเกณฑ์ {MAX_TOKENS_PER_CHUNK})")
+    else:
+        print(f"  ✅ Chunk #{idx}: {n_tokens} tokens (ผ่านเกณฑ์)")
 ```
 
 **เชื่อมกับโจทย์ที่ 1**: chunk ที่ยาว 900 ตัวอักษรเท่ากัน จะได้ token ต่างกันมากระหว่างไทยกับอังกฤษ
