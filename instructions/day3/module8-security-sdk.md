@@ -231,11 +231,24 @@ type hint กลายเป็น `inputSchema` และ docstring กลา�
 ---
 นำ Code ชุดนี้ไปแทน Code ที่ทำมาข้างต้นทั้งหมด เพิ่มระบบกรองข้อมูลความลับ (Redaction) ที่ต้องทำหน้าที่เซ็นเซอร์ข้อมูล (เช่น SNMP community string หรือ Password) ก่อนที่ข้อความจะหลุดออกไปหา LLM
 ```python
+import os
+import sys
+from pathlib import Path
 import datetime
 import json
+
+# ==========================================
+# 0. ตั้งค่า Path ให้ Python มองเห็นโฟลเดอร์ tools (แก้บั๊ก ModuleNotFoundError)
+# ==========================================
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from fastapi import FastAPI
+import uvicorn
 from mcp.server.fastmcp import FastMCP
 from tools.reports import get_safe_path
 
+# สร้างตัวแอปพลิเคชันหลัก
+app = FastAPI()
 mcp = FastMCP("MySecureServer")
 
 # ==========================================
@@ -310,7 +323,12 @@ def search_tickets(status: str | None = None, range: str = "last_30d") -> dict:
     return redact(raw_data)
 
 # ==========================================
-# 4. จุดทดสอบแบบรันจบในตัว (Simulated LLM Requests)
+# 4. นำ Tool ไปผูกกับ FastAPI (สำคัญมาก เพื่อให้รัน uvicorn ได้)
+# ==========================================
+app.mount("/mcp", mcp)
+
+# ==========================================
+# 5. จุดทดสอบแบบรันจบในตัว (Simulated LLM Requests)
 # ==========================================
 if __name__ == "__main__":
     print("🚀 เริ่มการทดสอบระบบป้องกันและเซ็นเซอร์ข้อมูล\n")
