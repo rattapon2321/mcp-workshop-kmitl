@@ -74,7 +74,7 @@ git clone ***Your URL***
 ```
 
 ```bash
-cd mcp-workshop
+cd mcp-workshop-kmitl
 ```
 
 ```bash
