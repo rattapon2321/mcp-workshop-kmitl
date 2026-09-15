@@ -29,7 +29,7 @@ docker compose -f docker/docker-compose.yml --env-file .env up -d
 ```bash
 docker compose -f docker/docker-compose.yml --env-file .env up seeder
 ```
-สำรอง***รันคำสั่งด้านล่างเพื่อปิดการทำงานและลบข้อมูลที่ค้างอยู่ในระบบ***
+สำรอง ***รันคำสั่งด้านล่างเพื่อปิดการทำงานและลบข้อมูลที่ค้างอยู่ในระบบ***
 ```bash
 docker compose -f docker/docker-compose.yml down -v
 ```
