@@ -18,7 +18,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # ---------- identity ----------
     server_name: str = Field(default="nt-network", alias="MCP_SERVER_NAME")
-    transport: str = Field(default="streamable-http", alias="MCP_TRANSPORT")
+    transport: str = Field(default="stdio", alias="MCP_TRANSPORT")
     port: int = Field(default=9000, alias="MCP_PORT")
 
     # ---------- PostgreSQL ----------
