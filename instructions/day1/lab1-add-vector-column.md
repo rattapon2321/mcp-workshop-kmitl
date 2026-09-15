@@ -44,7 +44,7 @@ cmd /c "docker exec -i mpls-neo4j cypher-shell -u neo4j -p neo4j_dev_password < 
 
 ```bash
 $headers = @{
-    "Authorization" = "Bearer sk-or-v1-***Your Key***"
+    "Authorization" = "Bearer ***Your Key***"
     "Content-Type" = "application/json"
 }
 $body = '{"model":"openai/text-embedding-3-small","input":["test"]}'
