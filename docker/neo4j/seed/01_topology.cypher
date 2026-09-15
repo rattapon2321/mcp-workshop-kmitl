@@ -2,7 +2,7 @@
 // Network topology for the workshop dataset.
 //
 // Neo4j owns relationships. Anything that is a "what connects to what"
-// question belongs here; ticket history and configuration live in PostgreSQL.
+// question belongs here, ticket history and configuration live in PostgreSQL.
 //
 // The single most important structure in this file:
 //   LPE-NBI-11, LPE-NBI-12 and LPE-NBI-13 all uplink to APE-NBI-03.
