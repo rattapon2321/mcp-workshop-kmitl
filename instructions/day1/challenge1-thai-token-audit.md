@@ -96,4 +96,4 @@ SELECT ticket_id, title, description FROM tickets ORDER BY random() LIMIT 50;
 
 ## สิ่งที่ต้องส่ง
 
-`challenge1_token_audit.py` + ตารางผลลัพธ์ + ข้อเสนอ 1 ย่อหน้า
+`solutions/challenges/challenge1_token_audit.py` + ตารางผลลัพธ์ + ข้อเสนอ 1 ย่อหน้า
