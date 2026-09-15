@@ -10,7 +10,7 @@
 // The workshop compares all three stores side by side - see
 // instructions/day3/lab5-vector-store-comparison.md
 //
-// Vectors are written by docker/seeder/seed.py; this file only declares
+// Vectors are written by docker/seeder/seed.py, this file only declares
 // the index so the property has somewhere to live.
 // ============================================================
 
