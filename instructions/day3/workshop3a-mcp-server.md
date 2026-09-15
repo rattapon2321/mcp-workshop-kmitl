@@ -29,11 +29,12 @@ uv run python apps/mcp-server/server.py --transport streamable-http --port 9000
 ```
 
 ```bash
-npx @modelcontextprotocol/inspector python apps/mcp-server/server.py
+npx @modelcontextprotocol/inspector uv run python apps/mcp-server/server.py
 ```
 หากเปิดไม่ได้ลองตรวจสอบว่ามีพอร์ตซ้ำหรือไม่
 `netstat -ano | findstr :9000`
 `taskkill /PID ***เลขที่ได้มา*** /F`
+
 ทำความเข้าใจโครงสร้างก่อนแก้:
 
 ```
