@@ -27,6 +27,9 @@ docker --version
 git --version
 ```
 ```bash
+uv venv
+```
+```bash
 uv pip install torch 
 ```
 ```bash
