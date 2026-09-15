@@ -101,7 +101,7 @@ files://read/../../../etc/passwd
 
 ดู `tools/tickets.py` → `search_tickets` เป็นแม่แบบ แล้วเติมที่เหลือตาม `# TODO`
 
-### 3.2 Tool รันสคริปต์ — จุดที่อันตรายที่สุด apps/mcp-server/tools/tickets.py
+### 3.2 Tool รันสคริปต์ — จุดที่อันตรายที่สุด apps/mcp-server/tools/reports.py
 
 ```python
 ALLOWED_SCRIPTS = {
@@ -126,7 +126,7 @@ def run_report_script(name: str, params: dict | None = None) -> dict:
 | มี timeout | สคริปต์ค้างจะกินทรัพยากรตลอดไป |
 | จำกัด output | output ยาวจะท่วม context |
 
-### 3.3 Tool สร้างรายงาน apps/mcp-server/tools/reports.py
+### 3.3 Tool สร้างรายงาน
 
 ```python
 @mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False})
