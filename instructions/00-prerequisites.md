@@ -61,7 +61,7 @@ Docker Desktop → Settings → Resources → Memory → **อย่างน้
 ทีมงานจะแจ้ง URL และ key ของ LLM ภายในให้ **กรุณาทดสอบล่วงหน้าจากเครื่องที่จะใช้จริง**
 
 ```bash
-curl.exe -s "https://openrouter.ai/api/v1/models" -H "Authorization: Bearer sk-or-v1-***Your Key***"
+curl.exe -s "https://openrouter.ai/api/v1/models" -H "Authorization: Bearer ***Your Key***"
 ```
 
 ถ้าต้องต่อ VPN ให้ทดสอบขณะต่อ VPN
