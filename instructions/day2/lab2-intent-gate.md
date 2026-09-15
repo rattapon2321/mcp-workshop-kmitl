@@ -60,7 +60,7 @@ flowchart TD
 
 ## สิ่งที่ต้องทำ
 
-### 1. เขียน fast path
+### 1. เขียน fast path apps/agent-api/agent/intent.py
 
 ```python
 def fast_path(message: str) -> IntentResult | None:
