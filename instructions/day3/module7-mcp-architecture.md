@@ -135,10 +135,10 @@ flowchart LR
 
 ## 5. spec เปลี่ยนอะไรมาบ้าง (สำคัญ)
 
-MCP ใช้ **วันที่เป็นเลขเวอร์ชัน** ไม่ใช่ 1.0/2.0
+MCP ใช้ **วันที่เป็นเลขเวอร์ชัน** ไม่ใช่ 1.0/2.0 make protocol-version 
 
 ```bash
-make protocol-version
+uv run python scripts/print_protocol_version.py
 ```
 
 | เวอร์ชัน | เปลี่ยนอะไร | กระทบเราไหม |
