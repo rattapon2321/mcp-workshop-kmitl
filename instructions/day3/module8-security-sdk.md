@@ -36,7 +36,7 @@ flowchart TD
 `docker/postgres/init/99_readonly_role.sql`:
 
 ```sql
-CREATE ROLE mcp_reader LOGIN PASSWORD '...';
+-- CREATE ROLE mcp_reader LOGIN PASSWORD '...';
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_reader;
 REVOKE CREATE ON SCHEMA public FROM mcp_reader;
 ALTER ROLE mcp_reader SET statement_timeout = '15s';
