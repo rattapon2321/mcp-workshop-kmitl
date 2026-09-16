@@ -100,7 +100,7 @@ for idx, chunk in enumerate(chunks):
 
 ### 2.4 ทดสอบว่าค้นเจอ
 
-ถาม Chainlit: *"ถ้า interface flap ควรตรวจอะไรก่อน"*
+ถาม Chainlit: *"ช่วยค้นหาในเอกสาร Runbook หรือคู่มือให้หน่อยว่า ถ้า interface flap ควรตรวจอะไรเป็นอันดับแรก"*
 ต้องเจอ runbook ที่เพิ่งเพิ่มเข้าไป
 
 ---
