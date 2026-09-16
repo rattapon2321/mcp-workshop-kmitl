@@ -233,7 +233,6 @@ uv run scripts/ingest_docs.py
 ```
 
 ค้นหาใน Dev Tools
-
 `
 GET network-docs/_search
 {
@@ -243,6 +242,7 @@ GET network-docs/_search
   }
 }
 `
+
 ---
 ## เกณฑ์ผ่าน
 
