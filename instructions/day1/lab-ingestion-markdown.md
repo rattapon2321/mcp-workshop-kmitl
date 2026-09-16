@@ -232,6 +232,17 @@ if __name__ == "__main__":
 uv run scripts/ingest_docs.py
 ```
 
+ค้นหาใน Dev Tools
+
+`
+GET network-docs/_search
+{
+  "size": 10,
+  "query": {
+    "match_all": {}
+  }
+}
+`
 ---
 ## เกณฑ์ผ่าน
 
