@@ -60,7 +60,7 @@ def embed_query(text: str) -> list[float] | None:
     try:
         response = httpx.post(
             f"{settings().embedding_base_url.rstrip('/')}/embeddings",
-            json={"model": settings().embedding_model, "input": [text]},
+            json={"model": settings().embedding_model, "input": [text], "dimensions": 768},
             headers={"Authorization": f"Bearer {settings().llm_api_key}"},
             timeout=20,
         )
